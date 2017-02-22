@@ -68,4 +68,9 @@ function createMap:assignSquares()
 	end
 end
 
+function createMap:recordMap()
+	table.save(map, 'grass_lands')
+	print('yes')
+end
+
 return createMap

@@ -1,8 +1,8 @@
 map = {}
 mapC = {}
-gridSize = 10
-startX, startY = 0,0
+gridSize = 35
 squareSize = 13
+startX, startY = gridSize*sqaureSize,0
 saveButtonH = squareSize*2
 saveButtonW = squareSize*7
 currType = 'test'

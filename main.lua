@@ -2,20 +2,28 @@ textDraw = require 'TextDelay.textDraw'
 mapFunctions = require 'MapFunc.map'
 createMap = require 'MapFunc.createMap'
 camera = require 'hump.camera'
-require('SaveTableToFile.SaveTable')
+require 'SaveTableToFile.SaveTable'
+require "enet"
 --dbStuff = require 'testDB.databaseStuff'
 json = require 'json4lua.json.json'
 --require('sqlite.sqlite3');
 
 
 function love.load()
+	--[[local host = enet.host_create"localhost:6789"
+  local event = host:service(100)
+  if event and event.type == "receive" then
+    print("Got message: ", event.data, event.peer)
+    event.peer:send(event.data)
+  end
+	print(host:peer_count())]]
 	m = 0
 	counter = 0
 	world = love.physics.newWorld(0, 0, true)
 	map:defineColours()
 	createMap:loadGrid()
 	createMap:loadMapEditor()
-	Camera = camera(200,150)
+	Camera = camera(0,0)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
 end
@@ -33,10 +41,11 @@ function love.update()
 	createMap:assignSquares()
 end
 
---[[function love.mousepressed(x, y, button, istouch)
+function love.mousepressed(x, y, button, istouch)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
-end]]
+	createMap:recordMap()
+end
 
 function love.keypressed(key)
   --[[if key == "backspace" then
