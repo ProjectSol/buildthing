@@ -23,14 +23,14 @@ function createMap:loadMapEditor()
 	local typeGridSize = 1
 	for i=1,(#types) do
 		local a = math.floor((i-1)/typeGridSize)
-		local drawY = squareSize*a + startY + (1*a)
+		local drawY = squareSize*a + (1*a)
 		local drawX = love.graphics:getWidth()-(squareSize*8)
 		local tile = {mode = 'fill', x = drawX, y = drawY, type = types[i], num = i}
 		table.insert(typeSwap, tile)
 	end
 	local i = #typeSwap+1
 	local a = math.floor((i-1)/typeGridSize)
-	local drawY = squareSize*a + startY + (1*a)-(squareSize/2)
+	local drawY = squareSize*a + (1*a)-(squareSize/2)
 	local drawX = love.graphics:getWidth()-(squareSize*10)-(squareSize/4)
 	saveTile = {mode = 'fill', x = drawX-squareSize, y = drawY+squareSize, type = save}
 	local saveButton = 'Save Map'
@@ -69,8 +69,8 @@ function createMap:assignSquares()
 end
 
 function createMap:recordMap()
-	table.save(map, 'grass_lands')
-	print('yes')
+	--table.save(map, 'asdf')
+	print('It\'s commented out')
 end
 
 return createMap

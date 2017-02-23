@@ -2,7 +2,7 @@ map = {}
 mapC = {}
 gridSize = 35
 squareSize = 13
-startX, startY = gridSize*sqaureSize,0
+startX, startY = -gridSize*squareSize/2,-gridSize*squareSize/2
 saveButtonH = squareSize*2
 saveButtonW = squareSize*7
 currType = 'test'
@@ -22,6 +22,10 @@ function map:defineColours()
 	rough = 'rough'
 	water = 'water'
 	types = {test, open, rough, water}
+end
+
+function map:pullMapData()
+	map = table.load('quadrants')
 end
 
 function checkInLine(tile1, tile2)
