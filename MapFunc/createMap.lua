@@ -69,8 +69,12 @@ function createMap:assignSquares()
 end
 
 function createMap:recordMap()
-	--table.save(map, 'asdf')
-	print('It\'s commented out')
+	if saveTile then
+		if checkCollision(saveTile.x, saveTile.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
+			--table.save(map, 'europe')
+			print('It\'s commented out')
+		end
+	end
 end
 
 return createMap

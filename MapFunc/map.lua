@@ -5,7 +5,7 @@ squareSize = 13
 startX, startY = -gridSize*squareSize/2,-gridSize*squareSize/2
 saveButtonH = squareSize*2
 saveButtonW = squareSize*7
-currType = 'test'
+currType = 'city'
 zoom = 1
 xShift = 0
 yShift = 0
@@ -18,14 +18,15 @@ b = {}
 
 function map:defineColours()
 	open = 'open'
-	test = 'test'
+	city = 'city'
 	rough = 'rough'
 	water = 'water'
-	types = {test, open, rough, water}
+	types = {city, open, rough, water}
 end
 
 function map:pullMapData()
-	map = table.load('quadrants')
+	map = table.load('europe')
+	print(map[10].type)
 end
 
 function checkInLine(tile1, tile2)
@@ -79,7 +80,7 @@ function map:drawMapEditor()
 					typeSwap[i].r = 100
 					typeSwap[i].g = 100
 					typeSwap[i].b = 50
-				elseif typeSwap[i].type == test then
+				elseif typeSwap[i].type == city then
 					typeSwap[i].r = 100
 					typeSwap[i].g = 100
 					typeSwap[i].b = 100
@@ -99,7 +100,7 @@ function map:drawMapEditor()
 				typeSwap[i].g = 100
 				typeSwap[i].b = 50
 				typeSwap[i].a = 255
-			elseif typeSwap[i].type == test then
+			elseif typeSwap[i].type == city then
 				typeSwap[i].r = 100
 				typeSwap[i].g = 100
 				typeSwap[i].b = 100
@@ -116,56 +117,45 @@ function map:drawMapEditor()
 	end
 end
 
-function map:drawMap()
-	for i = 1,#map do
-		mapC[i] = {r = 10, g = 10, b = 10, a = 10}
-		createMap:genTilePos(i)
-		if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-			mapC[i].a = 200
+function map:mapColour()
+	if love.mouse.isDown() then
+		for i = 1,#map do
+			mapC[i] = {r = 10, g = 10, b = 10, a = 10}
 			--print('x: '..map[i].x..' y: '..map[i].y..' Type: '..map[i].type)
-			if map[i].type == "open" then
+			if map[i].type == open then
 				mapC[i].r = 10
 				mapC[i].g = 200
 				mapC[i].b = 10
-			elseif map[i].type == "water" then
+			elseif map[i].type == water then
 				mapC[i].r = 10
 				mapC[i].g = 10
 				mapC[i].b = 200
-			elseif map[i].type == "rough" then
+			elseif map[i].type == rough then
 				mapC[i].r = 100
 				mapC[i].g = 100
 				mapC[i].b = 50
-			elseif map[i].type == "test" then
+			elseif map[i].type == city then
 				mapC[i].r = 100
 				mapC[i].g = 100
 				mapC[i].b = 100
 			end
-		elseif map[i].type == "open" then
-			mapC[i].r = 10
-			mapC[i].g = 200
-			mapC[i].b = 10
-			mapC[i].a = 255
-		elseif map[i].type == "water" then
-			mapC[i].r = 10
-			mapC[i].g = 10
-			mapC[i].b = 200
-			mapC[i].a = 255
-		elseif map[i].type == "rough" then
-			mapC[i].r = 100
-			mapC[i].g = 100
-			mapC[i].b = 50
-			mapC[i].a = 255
-		elseif map[i].type == "test" then
-			mapC[i].r = 100
-			mapC[i].g = 100
-			mapC[i].b = 100
-			mapC[i].a = 255
 		end
-
-		love.graphics.setColor(mapC[i].r, mapC[i].g, mapC[i].b, mapC[i].a)
-		love.graphics.rectangle(map[i].mode, drawX, drawY, squareSize, squareSize)
 	end
 end
+
+function map:drawMap()
+	for i = 1,#map do
+		createMap:genTilePos(i)
+		if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
+			mapC[i].a = 200
+		else
+			mapC[i].a = 255
+		end
+			love.graphics.setColor(mapC[i].r, mapC[i].g, mapC[i].b, mapC[i].a)
+			love.graphics.rectangle(map[i].mode, drawX, drawY, squareSize, squareSize)
+	end
+end
+
 
 function map:checkAdjacent(tile1)
 	tileOutput = {}

@@ -40,6 +40,7 @@ function love.update()
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
 	createMap:assignSquares()
+	map:mapColour()
 end
 
 function love.mousepressed(x, y, button, istouch)
