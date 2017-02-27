@@ -1,5 +1,5 @@
 textDraw = require 'TextDelay.textDraw'
-mapFunctions = require 'MapFunc.map'
+mapFunc = require 'MapFunc.map'
 createMap = require 'MapFunc.createMap'
 camera = require 'hump.camera'
 require 'SaveTableToFile.SaveTable'
@@ -8,6 +8,24 @@ require "enet"
 json = require 'json4lua.json.json'
 --require('sqlite.sqlite3');
 
+function mapDeclarations()
+	mapC = {}
+	gridSize = 35
+	squareSize = 13
+	startX, startY = -gridSize*squareSize/2,-gridSize*squareSize/2
+	saveButtonH = squareSize*2
+	saveButtonW = squareSize*7
+	currType = 'city'
+	zoom = 1
+	xShift = 0
+	yShift = 0
+	map = {}
+	mapSetup = {}
+	tileOutput = {}
+	r = {}
+	g = {}
+	b = {}
+end
 
 function love.load()
 	--[[local host = enet.host_create"localhost:6789"
@@ -17,11 +35,12 @@ function love.load()
     event.peer:send(event.data)
   end
 	print(host:peer_count())]]
+	mapDeclarations()
 	m = 0
 	counter = 0
 	world = love.physics.newWorld(0, 0, true)
-	map:defineColours()
-	map:pullMapData()
+	mapFunc:defineColours()
+	mapFunc:pullMapData()
 	--createMap:loadGrid()
 	createMap:loadMapEditor()
 	Camera = camera(0,0)
@@ -40,7 +59,7 @@ function love.update()
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
 	createMap:assignSquares()
-	map:mapColour()
+	mapFunc:mapColour()
 end
 
 function love.mousepressed(x, y, button, istouch)
@@ -73,9 +92,9 @@ textDraw:delayedNewText(line2, 2)
 
 function love.draw()
 	Camera:attach()
-	mapFunctions:drawMap()
+	mapFunc:drawMap()
 	Camera:detach()
-	mapFunctions:drawMapEditor()
+	mapFunc:drawMapEditor()
   if debug then
     love.graphics.setFont(font)
 		love.graphics.setColor(255, 255, 255)

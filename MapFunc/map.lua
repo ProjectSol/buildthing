@@ -1,22 +1,6 @@
-map = {}
-mapC = {}
-gridSize = 35
-squareSize = 13
-startX, startY = -gridSize*squareSize/2,-gridSize*squareSize/2
-saveButtonH = squareSize*2
-saveButtonW = squareSize*7
-currType = 'city'
-zoom = 1
-xShift = 0
-yShift = 0
-map = {}
-mapSetup = {}
-tileOutput = {}
-r = {}
-g = {}
-b = {}
+mapFunc = {}
 
-function map:defineColours()
+function mapFunc:defineColours()
 	open = 'open'
 	city = 'city'
 	rough = 'rough'
@@ -24,8 +8,8 @@ function map:defineColours()
 	types = {city, open, rough, water}
 end
 
-function map:pullMapData()
-	map = table.load('europe')
+function mapFunc:pullMapData()
+	map = table.load('assets/europe')
 	print(map[10].type)
 end
 
@@ -40,8 +24,8 @@ function checkInLine(tile1, tile2)
 	end
 end
 
-function map:tileScanTest(tile)
-	map:checkAdjacent(tile)
+function mapFunc:tileScanTest(tile)
+	mapFunc:checkAdjacent(tile)
 	for i = 1,#tileOutput do
 		local individualTile = tileOutput[i]
 		map[individualTile].type = 'rough'
@@ -49,7 +33,7 @@ function map:tileScanTest(tile)
 	tileOutput = {}
 end
 
-function map:drawMapEditor()
+function mapFunc:drawMapEditor()
 	if checkCollision(saveTile.x, saveTile.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
 		saveTile.r = 150
 		saveTile.g = 150
@@ -117,7 +101,8 @@ function map:drawMapEditor()
 	end
 end
 
-function map:mapColour()
+function mapFunc:mapColour()
+	print('HSUHGL')
 	if love.mouse.isDown() then
 		for i = 1,#map do
 			mapC[i] = {r = 10, g = 10, b = 10, a = 10}
@@ -143,7 +128,7 @@ function map:mapColour()
 	end
 end
 
-function map:drawMap()
+function mapFunc:drawMap()
 	for i = 1,#map do
 		createMap:genTilePos(i)
 		if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
@@ -157,7 +142,7 @@ function map:drawMap()
 end
 
 
-function map:checkAdjacent(tile1)
+function mapFunc:checkAdjacent(tile1)
 	tileOutput = {}
 	local blank = 0
 	local b = tile1
@@ -185,4 +170,4 @@ function map:checkAdjacent(tile1)
 	end
 end
 
-return map
+return mapFunc
