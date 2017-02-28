@@ -2,17 +2,22 @@ textDraw = require 'TextDelay.textDraw'
 mapFunc = require 'MapFunc.map'
 createMap = require 'MapFunc.createMap'
 camera = require 'hump.camera'
+UI = require 'UI.UI'
 require 'SaveTableToFile.SaveTable'
 require "enet"
---dbStuff = require 'testDB.databaseStuff'
+require "UI._table"
+require "UI.gui"
 json = require 'json4lua.json.json'
+--dbStuff = require 'testDB.databaseStuff'
 --require('sqlite.sqlite3');
 
 function mapDeclarations()
+	love.math.setRandomSeed( os.time() )
 	mapC = {}
+	playerResources = {money = 10000, metal = 500, food = 10000, tradeGoods = 40, luxuries = 5, ammunition = 50, civilWaste = 0, soldierWaste = 0, }
 	gridSize = 35
-	squareSize = 13
-	startX, startY = -gridSize*squareSize/2,-gridSize*squareSize/2
+	squareSize = 40
+	startX, startY = -gridSize*squareSize/2,love.graphics:getHeight()/30
 	saveButtonH = squareSize*2
 	saveButtonW = squareSize*7
 	currType = 'city'
@@ -25,6 +30,30 @@ function mapDeclarations()
 	r = {}
 	g = {}
 	b = {}
+	util = {}
+	function util.isInArea( x, y, x2, y2, w, h )
+    if x >= x2 and x <= x2 + w and y >= y2 and y <= y2+h then
+        return true
+    end
+    return false
+	end
+end
+
+function loadFiles( dir )
+	local objects = love.filesystem.getDirectoryItems( dir )
+	local tbl = {}
+	for i = 1,#objects do
+		if love.filesystem.isDirectory( dir.."/"..objects[ i ] ) then
+			tbl[ #tbl + 1 ] = dir.."/"..objects[ i ]
+		else
+			local name = dir.."/"..string.sub( objects[ i ], 0, string.len( objects[ i ] ) - 4 )
+			require( name )
+		end
+	end
+
+	for i = 1,#tbl do
+		loadFiles( tbl[ i ] )
+	end
 end
 
 function love.load()
@@ -36,16 +65,19 @@ function love.load()
   end
 	print(host:peer_count())]]
 	mapDeclarations()
+	loadFiles('UI/gui')
+	mapFunc:pullMapData()
 	m = 0
 	counter = 0
 	world = love.physics.newWorld(0, 0, true)
 	mapFunc:defineColours()
-	mapFunc:pullMapData()
 	--createMap:loadGrid()
-	createMap:loadMapEditor()
+	--createMap:loadMapEditor()
+	mapFunc:mapColour()
 	Camera = camera(0,0)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
+	UI:symbols()
 end
 
 function checkCollision(x1,y1,w1,h1, x2,y2,w2,h2)
@@ -55,20 +87,41 @@ function checkCollision(x1,y1,w1,h1, x2,y2,w2,h2)
 		y1 < y2 + h2
 end
 
+function love.mousemoved( x, y, dx, dy, istouch )
+	if love.mouse.isDown(1) then
+		Camera:move(-dx, -dy)
+	end
+end
+
 function love.update()
+	gui.update()
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
-	createMap:assignSquares()
-	mapFunc:mapColour()
+	--createMap:assignSquares()
+--	mapFunc:cameraMovement()
 end
 
 function love.mousepressed(x, y, button, istouch)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
 	createMap:recordMap()
+	mapFunc:mapColour()
+	gui.buttonCheck( x, y, button )
+	--mapFunc:cameraCheck(button, x, y)
+end
+
+function love.mousereleased(x, y, button, isTouch)
+	gui.buttonReleased( x, y, button, istouch )
+end
+
+function love.wheelmoved(dx, dy)
+	gui.wheelMoved( dx, dy )
 end
 
 function love.keypressed(key)
+	if key == "escape" then
+    love.event.quit()
+	end
   --[[if key == "backspace" then
     -- get the byte offset to the last UTF-8 character in the string.
     local byteoffset = utf8.offset(text, -1)
@@ -79,29 +132,36 @@ function love.keypressed(key)
       text = string.sub(text, 1, byteoffset - 1)
     end
   end]]
-  if key == "escape" then
-    love.event.quit()
-  end
 end
 
-line1 = 'This is a stand in for more potential text'
+line1 = 'dude game sux'
 line2 = 'See above and come to your own conclusion'
 
-textDraw:delayedNewText(line1, 1)
-textDraw:delayedNewText(line2, 2)
+--textDraw:delayedNewText(line1, 1)
+--textDraw:delayedNewText(line2, 2)
+
+function debugPrint()
+	if dbugPrint then
+		love.graphics.print(dbugPrint)
+	end
+end
 
 function love.draw()
 	Camera:attach()
 	mapFunc:drawMap()
 	Camera:detach()
-	mapFunc:drawMapEditor()
-  if debug then
-    love.graphics.setFont(font)
-		love.graphics.setColor(255, 255, 255)
-		fps = tostring(love.timer.getFPS())
-		love.graphics.print("Current FPS: "..fps, 9, 10)
-	end
-	textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
-  textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
+	--mapFunc:drawMapEditor()
+	--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
+  --textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
 	--love.graphics.print(counter, 0,10)
+	UI:drawUI()
+	love.graphics.setBackgroundColor(200, 200, 200, 255)
+	if debug then
+		love.graphics.setFont(font)
+		love.graphics.setColor(150, 150, 150)
+		fps = tostring(love.timer.getFPS())
+		love.graphics.print("Current FPS: "..fps, love.graphics:getWidth()-100, 16)
+	end
+	debugPrint()
+	gui.draw()
 end

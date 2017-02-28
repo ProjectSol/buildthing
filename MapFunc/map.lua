@@ -9,8 +9,8 @@ function mapFunc:defineColours()
 end
 
 function mapFunc:pullMapData()
-	map = table.load('assets/europe')
-	print(map[10].type)
+	map = table.load('europe')
+	print('dude game sux: '..#map)
 end
 
 function checkInLine(tile1, tile2)
@@ -103,44 +103,41 @@ end
 
 function mapFunc:mapColour()
 	print('HSUHGL')
-	if love.mouse.isDown() then
-		for i = 1,#map do
-			mapC[i] = {r = 10, g = 10, b = 10, a = 10}
-			--print('x: '..map[i].x..' y: '..map[i].y..' Type: '..map[i].type)
-			if map[i].type == open then
-				mapC[i].r = 10
-				mapC[i].g = 200
-				mapC[i].b = 10
-			elseif map[i].type == water then
-				mapC[i].r = 10
-				mapC[i].g = 10
-				mapC[i].b = 200
-			elseif map[i].type == rough then
-				mapC[i].r = 100
-				mapC[i].g = 100
-				mapC[i].b = 50
-			elseif map[i].type == city then
-				mapC[i].r = 100
-				mapC[i].g = 100
-				mapC[i].b = 100
-			end
+	for i = 1,#map do
+		table.insert(mapC, {r = 10, g = 10, b = 10, a = 10})
+		--print('x: '..map[i].x..' y: '..map[i].y..' Type: '..map[i].type)
+		if map[i].type == open then
+			mapC[i].r = 20
+			mapC[i].g = 150
+			mapC[i].b = 20
+		elseif map[i].type == water then
+			mapC[i].r = 20
+			mapC[i].g = 100
+			mapC[i].b = 150
+		elseif map[i].type == rough then
+			mapC[i].r = 75
+			mapC[i].g = 75
+			mapC[i].b = 40
+		elseif map[i].type == city then
+			mapC[i].r = 100
+			mapC[i].g = 100
+			mapC[i].b = 100
 		end
 	end
 end
 
+
 function mapFunc:drawMap()
 	for i = 1,#map do
+		mapC[i].a = 255
 		createMap:genTilePos(i)
 		if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-			mapC[i].a = 200
-		else
-			mapC[i].a = 255
+			mapC[i].a = 100
 		end
 			love.graphics.setColor(mapC[i].r, mapC[i].g, mapC[i].b, mapC[i].a)
 			love.graphics.rectangle(map[i].mode, drawX, drawY, squareSize, squareSize)
 	end
 end
-
 
 function mapFunc:checkAdjacent(tile1)
 	tileOutput = {}
@@ -169,5 +166,23 @@ function mapFunc:checkAdjacent(tile1)
 		end
 	end
 end
+
+--[[function mapFunc:cameraCheck(button, x, y)
+	--if button then
+		initialCamY = y
+		initialCamX = x
+		cameraMoving = true
+	--end
+end
+
+function mapFunc:cameraMovement()
+	dbugPrint = tostring(cameraMoving)
+	currCamX,currCamY = love.mouse.getPosition()
+	if love.mouse.isDown() and cameraMoving then
+		Camera:move(initialCamX - currCamX, initialCamY - currCamY)
+	else
+		cameraMoving = false
+	end
+end]]
 
 return mapFunc

@@ -5,6 +5,7 @@ fullText = {}
 utf8 = require("utf8")
 font = love.graphics.newFont()
 mainFont = love.graphics.newFont("assets/good times rg.ttf", 12)
+status = love.graphics.newFont("assets/good times rg.ttf", 12)
 
 function textDraw:delayedNewText(string, subs)
   if fullText[subs] then
