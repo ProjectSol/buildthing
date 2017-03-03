@@ -119,9 +119,9 @@ function mapFunc:mapColour()
 			mapC[i].g = 75
 			mapC[i].b = 40
 		elseif map[i].type == city then
-			mapC[i].r = 100
-			mapC[i].g = 100
-			mapC[i].b = 100
+			mapC[i].r = 65
+			mapC[i].g = 65
+			mapC[i].b = 65
 		end
 	end
 end
@@ -137,6 +137,7 @@ function mapFunc:drawMap()
 			love.graphics.setColor(mapC[i].r, mapC[i].g, mapC[i].b, mapC[i].a)
 			love.graphics.rectangle(map[i].mode, drawX, drawY, squareSize, squareSize)
 	end
+	UI:drawUnits()
 end
 
 function mapFunc:checkAdjacent(tile1)
@@ -167,22 +168,28 @@ function mapFunc:checkAdjacent(tile1)
 	end
 end
 
---[[function mapFunc:cameraCheck(button, x, y)
-	--if button then
-		initialCamY = y
-		initialCamX = x
-		cameraMoving = true
-	--end
-end
-
-function mapFunc:cameraMovement()
-	dbugPrint = tostring(cameraMoving)
-	currCamX,currCamY = love.mouse.getPosition()
-	if love.mouse.isDown() and cameraMoving then
-		Camera:move(initialCamX - currCamX, initialCamY - currCamY)
-	else
-		cameraMoving = false
+function mapFunc:cameraMovement(dx, dy)
+	if love.mouse.isDown(1) then
+		xCamLimit = gridSize*squareSize+gridSize--+love.graphics:getWidth()/2
+		Camera:move(-dx, -dy)
+		local cx, cy = Camera:position()
+		if cx - dx <= love.graphics:getWidth()/2-1 then
+			Camera:lookAt(love.graphics:getWidth()/2-1, cy)
+			cx, cy = Camera:position()
+		end
+		if cx - dx >= xCamLimit-love.graphics:getWidth()/2+1 then
+			Camera:lookAt(xCamLimit-love.graphics:getWidth()/2+1, cy)
+			cx, cy = Camera:position()
+		end
+		if cy - dy <= love.graphics:getHeight()/2-31 then
+			Camera:lookAt(cx, love.graphics:getHeight()/2-31)
+			cx, cy = Camera:position()
+		end
+		--[[if cy - dy >= 1077 then
+			Camera:lookAt(cx, 1077)
+			cx, cy = Camera:position()
+		end]]
 	end
-end]]
+end
 
 return mapFunc

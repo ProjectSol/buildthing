@@ -28,7 +28,7 @@ function PANEL:_initialize()
 	self:setFont( defaultFont )
 	self:setText( "Click me!" )
 	self:setCanClick( true )
-	self:setTextOffest( 0, 0 )
+	self:setTextOffset( 0, 0 )
 end
 
 function PANEL:onSizeChanged()
@@ -50,7 +50,7 @@ function PANEL:getText( text )
 	return self.__text
 end
 
-function PANEL:setTextOffest( x, y )
+function PANEL:setTextOffset( x, y )
 	self.__textOffset = { x = x, y = y }
 end
 

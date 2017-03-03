@@ -8,22 +8,27 @@ require "enet"
 require "UI._table"
 require "UI.gui"
 json = require 'json4lua.json.json'
+require "Empire/cityCreation"
 --dbStuff = require 'testDB.databaseStuff'
 --require('sqlite.sqlite3');
 
 function mapDeclarations()
 	love.math.setRandomSeed( os.time() )
 	mapC = {}
-	playerResources = {money = 10000, metal = 500, food = 10000, tradeGoods = 40, luxuries = 5, ammunition = 50, civilWaste = 0, soldierWaste = 0, }
-	gridSize = 35
-	squareSize = 40
-	startX, startY = -gridSize*squareSize/2,love.graphics:getHeight()/30
+	player = {}
+	player.resources = {money = 10000, metal = 500, food = 10000, tradeGoods = 40, luxuries = 5, ammunition = 50000, waste = 0}
+	player.income = {money = 100, metal = 6, food = 500, tradeGoods = 3, luxuries = -4, ammunition = 150, waste = 0.05}
+	gridSize = 50
+	squareSize = 20
+	startX, startY = 0,0
 	saveButtonH = squareSize*2
 	saveButtonW = squareSize*7
 	currType = 'city'
 	zoom = 1
 	xShift = 0
 	yShift = 0
+	cities = {}
+	visUnits = {}
 	map = {}
 	mapSetup = {}
 	tileOutput = {}
@@ -56,6 +61,10 @@ function loadFiles( dir )
 	end
 end
 
+function updateDeclarations()
+	cCreation:markCities()
+end
+
 function love.load()
 	--[[local host = enet.host_create"localhost:6789"
   local event = host:service(100)
@@ -65,19 +74,23 @@ function love.load()
   end
 	print(host:peer_count())]]
 	mapDeclarations()
-	loadFiles('UI/gui')
-	mapFunc:pullMapData()
+	--loadFiles('UI/gui')
+	--mapFunc:pullMapData()
 	m = 0
 	counter = 0
 	world = love.physics.newWorld(0, 0, true)
 	mapFunc:defineColours()
-	--createMap:loadGrid()
-	--createMap:loadMapEditor()
+	createMap:loadGrid()
+	createMap:loadMapEditor()
 	mapFunc:mapColour()
-	Camera = camera(0,0)
+	Camera = camera(love.graphics:getWidth()/2, love.graphics:getHeight()/2-31)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
+	--[[cCreation:gameStart()
+	cCreation:cityPanelDeclaration()
+	UI:updateDisplay()
 	UI:symbols()
+	UI:loadDescriptions()]]
 end
 
 function checkCollision(x1,y1,w1,h1, x2,y2,w2,h2)
@@ -88,17 +101,14 @@ function checkCollision(x1,y1,w1,h1, x2,y2,w2,h2)
 end
 
 function love.mousemoved( x, y, dx, dy, istouch )
-	if love.mouse.isDown(1) then
-		Camera:move(-dx, -dy)
-	end
+	mapFunc:cameraMovement(dx, dy)
 end
 
 function love.update()
 	gui.update()
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
-	--createMap:assignSquares()
---	mapFunc:cameraMovement()
+	createMap:assignSquares()
 end
 
 function love.mousepressed(x, y, button, istouch)
@@ -106,8 +116,8 @@ function love.mousepressed(x, y, button, istouch)
 	localX, localY = love.mouse.getPosition()
 	createMap:recordMap()
 	mapFunc:mapColour()
+	cCreation:displayCityPage()
 	gui.buttonCheck( x, y, button )
-	--mapFunc:cameraCheck(button, x, y)
 end
 
 function love.mousereleased(x, y, button, isTouch)
@@ -137,12 +147,12 @@ end
 line1 = 'dude game sux'
 line2 = 'See above and come to your own conclusion'
 
---textDraw:delayedNewText(line1, 1)
---textDraw:delayedNewText(line2, 2)
+textDraw:delayedNewText(line1, 1)
+textDraw:delayedNewText(line2, 2)
 
 function debugPrint()
 	if dbugPrint then
-		love.graphics.print(dbugPrint)
+		love.graphics.print(dbugPrint, dbugX or 0, dbugY or 0)
 	end
 end
 
@@ -150,11 +160,11 @@ function love.draw()
 	Camera:attach()
 	mapFunc:drawMap()
 	Camera:detach()
-	--mapFunc:drawMapEditor()
+	mapFunc:drawMapEditor()
 	--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
   --textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
 	--love.graphics.print(counter, 0,10)
-	UI:drawUI()
+	--UI:drawUI()
 	love.graphics.setBackgroundColor(200, 200, 200, 255)
 	if debug then
 		love.graphics.setFont(font)
@@ -162,6 +172,8 @@ function love.draw()
 		fps = tostring(love.timer.getFPS())
 		love.graphics.print("Current FPS: "..fps, love.graphics:getWidth()-100, 16)
 	end
+		love.graphics.setColor(200, 50, 50)
+		love.graphics.print(love.mouse.getY(), 200, 200)
 	debugPrint()
 	gui.draw()
 end
