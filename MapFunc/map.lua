@@ -9,7 +9,7 @@ function mapFunc:defineColours()
 end
 
 function mapFunc:pullMapData()
-	map = table.load('europe')
+	map = table.load(currMap)
 	print('dude game sux: '..#map)
 end
 
@@ -137,7 +137,6 @@ function mapFunc:drawMap()
 			love.graphics.setColor(mapC[i].r, mapC[i].g, mapC[i].b, mapC[i].a)
 			love.graphics.rectangle(map[i].mode, drawX, drawY, squareSize, squareSize)
 	end
-	UI:drawUnits()
 end
 
 function mapFunc:checkAdjacent(tile1)
@@ -169,12 +168,13 @@ function mapFunc:checkAdjacent(tile1)
 end
 
 function mapFunc:cameraMovement(dx, dy)
-	if love.mouse.isDown(1) then
+	if love.mouse.isDown(2) then
 		xCamLimit = gridSize*squareSize+gridSize--+love.graphics:getWidth()/2
+		yCamLimit = gridSize*squareSize+gridSize
 		Camera:move(-dx, -dy)
 		local cx, cy = Camera:position()
-		if cx - dx <= love.graphics:getWidth()/2-1 then
-			Camera:lookAt(love.graphics:getWidth()/2-1, cy)
+		if cx - dx <= love.graphics:getWidth()/2 then
+			Camera:lookAt(love.graphics:getWidth()/2, cy)
 			cx, cy = Camera:position()
 		end
 		if cx - dx >= xCamLimit-love.graphics:getWidth()/2+1 then
@@ -185,10 +185,10 @@ function mapFunc:cameraMovement(dx, dy)
 			Camera:lookAt(cx, love.graphics:getHeight()/2-31)
 			cx, cy = Camera:position()
 		end
-		--[[if cy - dy >= 1077 then
-			Camera:lookAt(cx, 1077)
+		if cy - dy >= yCamLimit-love.graphics:getHeight()/2 then
+			Camera:lookAt(cx, yCamLimit-love.graphics:getHeight()/2)
 			cx, cy = Camera:position()
-		end]]
+		end
 	end
 end
 

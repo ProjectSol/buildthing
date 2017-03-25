@@ -1,0 +1,17 @@
+SOLOMON COLOURS = BLACK
+
+1. Turquoise = #1abc9c
+2. Emerald = #2ecc71
+3. Blueish = #2980b9
+4. Sex Purple = #8e44ad
+5. Moist Asphalt = #34495e
+6. Sun = #f1c40f
+7. Peter Pumpkin = #d35400
+8. Some Red = #c0392b
+9. Silver = #bdc3c7
+10. Wheat = #8B7E66
+11. Girl Colour = #FF00FF
+12. dark.Green = #228B22
+13. Off Orange Fruit = #8B5A00
+14. Sepia = #5E2612
+15. Solomon = #000000

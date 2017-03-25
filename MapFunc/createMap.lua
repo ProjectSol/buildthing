@@ -5,7 +5,7 @@ function createMap:loadGrid()
 		for i=1,(gridSize)^2 do
 			local type = open
 
-			local tile = {id = i, mode = 'fill', type = type}
+			local tile = {id = i, mode = 'fill', type = type, city = nil}
 			table.insert(map, tile)
 		end
 	end
@@ -69,12 +69,12 @@ function createMap:assignSquares()
 end
 
 function createMap:recordMap()
-	if saveTile then
-		if checkCollision(saveTile.x, saveTile.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
-			--table.save(map, 'europe')
+	--if saveTile then
+		--if checkCollision(saveTile.x, saveTile.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
+			table.save(map, currMap)
 			print('It\'s commented out')
-		end
-	end
+		--end
+	--end
 end
 
 return createMap

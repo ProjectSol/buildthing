@@ -1,77 +1,77 @@
-cCreation = {}
+CITY = {}
 
-function cCreation:displayCityPage()
-  for i = 1,#map do
-    if map[i].type == city then
-      createMap:genTilePos(i)
-      --abaca = drawX
-      --cbcac = drawY
-      if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-        cityPanel1Display = true
-        cityPanel2Display = true
-      else
-        cityPanel1Display = false
-        cityPanel2Display = false
-      end
-    end
-  end
-  --[[if cityPage[i] == true then
-    if checkCollision(cityPanel:getPos(), cityPanel:getSize(), worldX, worldY, 1, 1) then
-      cityPage[i] = false
-    end
-  end]]
+function CITY.getIncome()
+  local localIncome = self.baseMaintenance + self.moneyProduced + self.buildingMaintenance
+  return localIncome
 end
 
-function cCreation:drawCityPages()
+function CITY.create(num)
 
 end
 
-function cCreation:gameStart()
+function CITY.popGrowth()
+  local a = self.pop
+  local b =  self.storedFood
+  if b>=a then
+    local eaten = self.pop*1.5
+    if eaten > self.storedFood then
+      eaten = self.storedFood
+    end
+    self.storedFood = self.storedFood-eaten
+    self.popGrowthProg = self.popGrowthProg + self.pop/(eaten/5)
+  else
+    self.popGrowthProg = self.popGrowthprog - (a-b)
+    self.storedFood = self.storedFood-self.pop
+  end
+  if self.popGrowthProg >= 1 then
+    self.pop = self.pop+1
+    self.storedFood = self.storedFood-self.pop
+    self.popGrowthProg = self.popGrowthProg-1
+  elseif self.popGrowthProg <  0 then
+    self.pop = self.pop-1
+    self.storedFood = self.storedFood-self.pop
+    self.popGrowthProg = self.popGrowthProg+1
+  end
+end
+
+function CITY:gameStart()
   for i = 1,#map do
-    if map[i].type == city then
-      table.insert(cities, map[i])
+    if map[i].type == cities then
+      mc = map[i].cities
+      local city = {}
+
+      city.name = tostring(i)
+      city.location = i
+
+      city.pop = 1
+      city.popGrowthProg = 0
+
+      city.storedFood = 5
+      city.foodStorageBase = 5
+      city.foodStorageIncrease = 0
+      city.farming = 1/2
+      city.consumption = city.getFoodConsumption
+      city.foodExcess = city.getExcessFood
+
+      city.buildings = {}
+
+      city.baseMaintenance = -1
+      city.buildingMaintenance = 0
+      city.moneyProduced = 0
+      city.cityIncome = city.getIncome
+
+      city.baseHappiness = 3
+      city.unhappiness = city.getUnhappiness
+
+      table.insert(mc, city)
     end
   end
+end
+
+function CITY:textDec()
   for i = 1,#cities do
-    cities[i].team = i
+
   end
 end
 
-function cCreation:markCities()
-  for i = 1,#map do
-    if map[i].type == city then
-      table.insert(cities, map[i])
-    end
-  end
-end
-
-function cCreation:cityPanelDeclaration()
-  local cityPanel1 = gui.create( "panel" )
-  cityPanel1:setPos( 5,love.graphics:getHeight()/16 )
-  cityPanel1:setSize( 300,love.graphics:getHeight()-love.graphics:getHeight()/16-40 )
-  function cityPanel1:paint(w, h)
-    if cityPanel1Display then
-      love.graphics.setColor(200, 200, 200, 230)
-      love.graphics.rectangle( "fill", 0, 0, w, h)
-    end
-  end
-
-  local cityPanel2 = gui.create( "button" )
-  cityPanel2:setPos( 5,love.graphics:getHeight()/16 )
-  cityPanel2:setSize( 300,love.graphics:getHeight()-love.graphics:getHeight()/16-40 )
-  function cityPanel2:paint(w, h)
-    if cityPanel2Display then
-      love.graphics.setColor(50, 50, 50)
-      love.graphics.setLineWidth(10)
-      love.graphics.rectangle('line', 0, 0, w, h, 10, 10, 20)
-    end
-  end
-end
-
-function cCreation:textDec()
-  for i = 1,#cities do
-    cityPanel2:setText(cityText[i])
-  end
-end
-
-return cCreation
+return CITY

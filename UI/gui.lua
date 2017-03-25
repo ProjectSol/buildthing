@@ -9,7 +9,7 @@ gui.panels 	= {} -- Panels that have been registered.
 gui.cache 	= {}
 gui._maxz 	= 0
 gui._minz 	= 0
-gui.pos 	= 0
+gui.pos 	  = 0
 
 --[[----------------------------------------
 	gui.create( base, parent )
@@ -21,7 +21,7 @@ function gui.create( class, parent )
 	if bPanel then
 		panel = table.copy( bPanel )
 	else
-		
+
 		return
 	end
 
@@ -44,7 +44,7 @@ function gui.create( class, parent )
 	local pos = gui.pos
 	panel.__id = pos
 	table.insert( gui.objects, panel )
-
+ 
 	panel:setZ( gui.getMaxZ() + 1 )
 	panel:_initialize()
 	panel:initialize()
