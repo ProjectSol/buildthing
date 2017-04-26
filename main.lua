@@ -4,10 +4,9 @@ createMap = require 'MapFunc/createMap'
 camera = require 'hump/camera'
 UI = require 'UI/UI'
 require 'SaveTableToFile/SaveTable'
-require "enet"
 require "UI/_table"
 require "UI/gui"
-require "lume/lume"
+lume = require "lume/lume"
 json = require 'json4lua/json/json'
 require "Empire/cityCreation"
 --dbStuff = require 'testDB.databaseStuff'
@@ -173,6 +172,8 @@ function love.keypressed(key)
   end]]
 end
 
+function love.wheelmoved(x (number), y (number))
+
 line1 = 'dude game sux'
 line2 = 'See above and come to your own conclusion'
 
@@ -201,7 +202,7 @@ function love.draw()
 	love.graphics.setFont(font)
 	love.graphics.setColor(150, 0, 0)
 	fps = tostring(love.timer.getFPS())
-	love.graphics.print("Current FPS: "..fps, love.graphics:getWidth()-100, 16)
+	love.graphics.print("Current FPS: "..fps, love.graphics:getWidth()-150, 16)
 	love.graphics.setColor(200, 50, 50)
 	gui.draw()
 end
