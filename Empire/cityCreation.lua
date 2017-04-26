@@ -49,7 +49,7 @@ function CITY:gameStart()
       city.storedFood = 5
       city.foodStorageBase = 5
       city.foodStorageIncrease = 0
-      city.farming = 1/2
+      city.farming = 0.5
       city.consumption = city.getFoodConsumption
       city.foodExcess = city.getExcessFood
 
@@ -62,6 +62,7 @@ function CITY:gameStart()
 
       city.baseHappiness = 3
       city.unhappiness = city.getUnhappiness
+      city.currHappiness = city.baseHappiness + city.getUnhappiness
 
       table.insert(mc, city)
     end
