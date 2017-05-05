@@ -15,7 +15,6 @@ require "Empire/cityCreation"
 function mapDeclarations()
 	love.math.setRandomSeed( os.time() )
 	currMap = 'europe'
-	teamColours()
 	mapC = {}
 	player = {}
 	player.resources = {money = 10000, metal = 5000, food = 100, tradeGoods = 40, luxuries = 5, ammunition = 50000, waste = 0}
@@ -26,11 +25,26 @@ function mapDeclarations()
 	saveButtonH = squareSize*2
 	saveButtonW = squareSize*7
 	currType = 'city'
+	clickTF = false
+	clickTime = love.timer.getTime()
 	zoom = 1
 	xShift = 0
 	yShift = 0
 	cities = {}
-	visUnits = {{name = 'infantry1', team = 1, location = 61, playerColour = teamColours[1]}}
+	--[[teamColours1 = {
+	{46,208,176}, {41,128,185},
+	{26, 194, 93},{142,68,173},
+	{96,105,127}, {241,196,15},
+	{211,84,0}, {192,57,43},
+	{255,140,0}, {255,28,0},
+	{255,0,255}, {34,139,34},
+	{139,90,0}, {94,38,18},
+	{10,10,10}, {255,255,255}
+}]]
+
+	infant1 = {name = 'infantry1', team = 6, teamId = 1, location = 61, colour = teamColours1[6]}
+	infant2 = {name = 'infantry2', team = 3, teamId = 1, location = 164, colour = teamColours1[3]}
+	units = {infant1, infant2}
 	map = {}
 	mapSetup = {}
 	tileOutput = {}
@@ -65,29 +79,28 @@ end
 
 function teamColours()
 	teamColours1 = {
-	{26,188,156},
-	{41,128,185}, {241,196,15},
-	{142,68,173}, {52,73,94},
-	{241,196,15}, {211,84,0},
-	{192,57,43}, {189,195,199},
-	{139,126,102}, {255,0,255},
-	{34,139,34}, {139,90,0},
-	{94,38,18}, {0,0,0}
+	{46,208,176}, {41,128,185},
+	{169, 216, 149},{142,68,173},
+	{96,105,127}, {241,196,15},
+	{225,110,0}, {255,28,0},
+	{169,175,179}, {139,126,102},
+	{255,0,255}, {68, 112, 68},
+	{139,90,0}, {178, 103, 103},
+	{20,20,20}, {255,255,255}
 	}
-	teamColours = {
+	--[[teamColours = {
 	Turquoise = {26,188,156},
 	Blue = {41,128,185}, Emerald = {241,196,15},
-	Purple = {142,68,173}, Asphalt = {52,73,94},
+	Purple = {142,68,173}, Asphalt = {56,75,97},
 	Sun = {241,196,15}, Pumpkin = {211,84,0},
 	Red = {192,57,43}, Silver = {189,195,199},
 	Wheat = {139,126,102}, Pink = {255,0,255},
 	Green = {34,139,34}, Brown = {139,90,0},
 	Sepia = {94,38,18}, Black = {0,0,0}
-	}
+}]]
 end
 
 function updateDeclarations()
-
 	UI:updateDisplay()
 end
 
@@ -99,6 +112,7 @@ function love.load()
     event.peer:send(event.data)
   end
 	print(host:peer_count())]]
+	teamColours()
 	mapDeclarations()
 	loadFiles('UI/gui')
 	mapFunc:pullMapData()
@@ -131,6 +145,10 @@ function love.mousemoved( x, y, dx, dy, istouch )
 end
 
 function love.update()
+	--clickTime = love.timer.getTime()
+	if love.timer.getTime() > clickTime then
+		clickTF = false
+	end
 	gui.update()
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
@@ -141,8 +159,11 @@ function love.mousepressed(x, y, button, istouch)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
 	--createMap:recordMap()
-	UI:displayCityPage()
-	UI:displayUnitPage()
+
+	if UI:checkDoubleClickMap() then
+		UI:displayCityPage()
+		UI:displayUnitPage()
+	end
 	mapFunc:mapColour()
 
 	gui.buttonCheck( x, y, button )
@@ -172,8 +193,6 @@ function love.keypressed(key)
   end]]
 end
 
-function love.wheelmoved(x (number), y (number))
-
 line1 = 'dude game sux'
 line2 = 'See above and come to your own conclusion'
 
@@ -182,9 +201,13 @@ textDraw:delayedNewText(line2, 2)
 
 function debugPrint()
 	if dbugPrint then
-		love.graphics.setFont(status)
-		love.graphics.setColor(255, 255, 255)
+		love.graphics.setFont(debugFont)
+		love.graphics.setColor(0,0,0)
 		love.graphics.print(dbugPrint, 900, 900)
+	else
+		love.graphics.setFont(debugFont)
+		love.graphics.setColor(0,0,0)
+		love.graphics.print("nothing", 900, 900)
 	end
 end
 
@@ -192,6 +215,13 @@ function love.draw()
 	Camera:attach()
 	mapFunc:drawMap()
 	UI:drawUnits()
+	--[[ Some old debugging stuff
+	love.graphics.setFont(debugFont)
+	love.graphics.print(tostring(clickTime), 0, 0)
+	love.graphics.print(tostring(clickTF), 990, 0)
+	love.graphics.setColor(50,50,80)
+	love.graphics.print(#cities, 0, 100)
+	love.graphics.print(tostring(clickTF), 990, 100)]]
 	Camera:detach()
 	--mapFunc:drawMapEditor()
 	--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)

@@ -546,20 +546,37 @@ function UI:drawStatusBar()
 end
 
 function UI:displayUnitPage()
-  for i = 1,#visUnits do
-    if visUnits[i] then
-      local loc = visUnits[i].location
+  for i = 1,#units do
+    if units[i] then
+      local loc = units[i].location
       createMap:genTilePos(loc)
       worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
       localX, localY = love.mouse.getPosition()
       if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
         unitPanelDisplay = true
-        unitName = visUnits[i].name
+        unitName = units[i].name
         break
       else
         unitPanelDisplay = false
       end
     end
+  end
+end
+
+function UI:checkDoubleClickMap()
+  if clickTF == true then
+    if love.timer.getTime() <= clickTime then
+      clickTF = false
+      return true
+    else
+      clickTF = true
+      clickTime = love.timer.getTime()+1
+      return false
+    end
+  else
+    clickTF = true
+    clickTime = love.timer.getTime()+1
+    return false
   end
 end
 
@@ -592,9 +609,9 @@ function UI:drawUnits()
       UI:cityTag(drawX, drawY, i)
     end
   end
-  for i = 1,#visUnits do
-    if visUnits[i] then
-      local loc = visUnits[i].location
+  for i = 1,#units do
+    if units[i] then
+      local loc = units[i].location
       createMap:genTilePos(loc)
       UI:unitTag(drawX, drawY, i)
     end
@@ -603,19 +620,21 @@ end
 
 function UI:unitTag(x, y, i)
   local white = {255, 255, 255, 255}
-  love.graphics.setColor(visUnits.playerColour or white)
+  love.graphics.setColor(units[i].colour or white)
   local vertices = {x+squareSize-1, y+1, x+squareSize/2, y+1, x+squareSize-1, y+squareSize/2}
   love.graphics.polygon('fill', vertices)
 end
 
 function UI:cityTag(x, y, i)
   local white = {255, 255, 255, 255}
-  --[[local k = love.math.random(1, #teamColours1)
-  local white = teamColours1[k] ]]
-  love.graphics.setColor(--[[cities[i].player.colour or]] white)
-  local vertices = {x+1, y+1, x+1, y+squareSize/2-1, x+squareSize/2-1, y+1}
-  love.graphics.polygon('fill', vertices)
-  --love.graphics.polygon('fill', x,y, x-1,y-1, x+1,y+1)
+  for q = 1,#cities do
+    if cities[q].loc == i then
+      love.graphics.setColor(cities[q].colour or white)
+      local vertices = {x+1, y+1, x+1, y+squareSize/2-1, x+squareSize/2-1, y+1}
+      love.graphics.polygon('fill', vertices)
+      --love.graphics.polygon('fill', x,y, x-1,y-1, x+1,y+1)
+    end
+  end
 end
 
 return UI

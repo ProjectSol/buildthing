@@ -102,7 +102,6 @@ function mapFunc:drawMapEditor()
 end
 
 function mapFunc:mapColour()
-	print('HSUHGL')
 	for i = 1,#map do
 		table.insert(mapC, {r = 10, g = 10, b = 10, a = 10})
 		--print('x: '..map[i].x..' y: '..map[i].y..' Type: '..map[i].type)
@@ -140,7 +139,7 @@ function mapFunc:drawMap()
 end
 
 function mapFunc:checkAdjacent(tile1)
-	tileOutput = {}
+	local tileOutput = {}
 	local blank = 0
 	local b = tile1
 
@@ -165,6 +164,7 @@ function mapFunc:checkAdjacent(tile1)
 			end
 		end
 	end
+	return tileOutput
 end
 
 function mapFunc:cameraMovement(dx, dy)

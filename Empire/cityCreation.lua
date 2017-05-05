@@ -9,6 +9,11 @@ function CITY.create(num)
 
 end
 
+function CITY.getUnhappiness()
+  unhappinessTotal = 3
+  self.unhappiness = unhappinessTotal
+end
+
 function CITY.popGrowth()
   local a = self.pop
   local b =  self.storedFood
@@ -35,15 +40,25 @@ function CITY.popGrowth()
 end
 
 function CITY:gameStart()
+  local num = {}
+  local k = 0
   for i = 1,#map do
-    if map[i].type == cities then
-      mc = map[i].cities
-      local city = {}
+    if map[i].type == city then
+      local k = k+1
+      table.insert(num, k)
+    end
+  end
+  for i = 1,#map do
+    if map[i].type == city then
+      local g = #cities+1 or 1
+      local name = 'ecksdee'
+      local loc = i
+      local team = g
+      local colour = teamColours1[g]
+      local cit = {name = name, loc = loc, team = team, colour = colour}
 
-      city.name = tostring(i)
-      city.location = i
-
-      city.pop = 1
+      table.insert(cities, cit)
+      --[[city.pop = 1
       city.popGrowthProg = 0
 
       city.storedFood = 5
@@ -62,9 +77,7 @@ function CITY:gameStart()
 
       city.baseHappiness = 3
       city.unhappiness = city.getUnhappiness
-      city.currHappiness = city.baseHappiness + city.getUnhappiness
-
-      table.insert(mc, city)
+      city.currHappiness = city.baseHappiness]]
     end
   end
 end
