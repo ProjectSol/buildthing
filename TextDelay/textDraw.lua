@@ -4,9 +4,15 @@ text = ''
 fullText = {}
 utf8 = require("utf8")
 font = love.graphics.newFont()
+rasterizer = love.font.newRasterizer( "assets/good times rg.ttf" )
+status = love.graphics.newFont(rasterizer)
+status:setFilter( 'nearest', 'nearest', 1 )
 mainFont = love.graphics.newFont("assets/good times rg.ttf", 12)
+mainFont:setFilter( 'nearest', 'nearest', 1 )
 debugFont = love.graphics.newFont("assets/good times rg.ttf", 50)
-status = love.graphics.newFont("assets/good times rg.ttf", 12)
+smolFont = love.graphics.newFont("assets/good times rg.ttf", 8)
+smolFont:setFilter( 'nearest', 'nearest', 1 )
+--status = love.graphics.newFont("assets/good times rg.ttf", 12)
 
 function textDraw:delayedNewText(string, subs)
   if fullText[subs] then

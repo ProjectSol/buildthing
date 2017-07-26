@@ -44,7 +44,7 @@ function gui.create( class, parent )
 	local pos = gui.pos
 	panel.__id = pos
 	table.insert( gui.objects, panel )
- 
+
 	panel:setZ( gui.getMaxZ() + 1 )
 	panel:_initialize()
 	panel:initialize()

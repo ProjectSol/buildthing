@@ -44,40 +44,15 @@ function CITY:gameStart()
   local k = 0
   for i = 1,#map do
     if map[i].type == city then
-      local k = k+1
-      table.insert(num, k)
-    end
-  end
-  for i = 1,#map do
-    if map[i].type == city then
       local g = #cities+1 or 1
-      local name = 'ecksdee'
-      local loc = i
       local team = g
+      local name = 'City: '..g..' Team: '..team
+      local loc = i
       local colour = teamColours1[g]
+      local building = false
       local cit = {name = name, loc = loc, team = team, colour = colour}
 
       table.insert(cities, cit)
-      --[[city.pop = 1
-      city.popGrowthProg = 0
-
-      city.storedFood = 5
-      city.foodStorageBase = 5
-      city.foodStorageIncrease = 0
-      city.farming = 0.5
-      city.consumption = city.getFoodConsumption
-      city.foodExcess = city.getExcessFood
-
-      city.buildings = {}
-
-      city.baseMaintenance = -1
-      city.buildingMaintenance = 0
-      city.moneyProduced = 0
-      city.cityIncome = city.getIncome
-
-      city.baseHappiness = 3
-      city.unhappiness = city.getUnhappiness
-      city.currHappiness = city.baseHappiness]]
     end
   end
 end

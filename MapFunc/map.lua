@@ -9,7 +9,10 @@ function mapFunc:defineColours()
 end
 
 function mapFunc:pullMapData()
-	map = table.load(currMap)
+	love.filesystem.setIdentity('buildthing/maps')
+	local mapl = jupiter.load("Europe.txt")
+	map = mapl[1]
+	--[[map = table.load(currMap)]]
 	print('dude game sux: '..#map)
 end
 
@@ -133,38 +136,44 @@ function mapFunc:drawMap()
 		if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
 			mapC[i].a = 100
 		end
-			love.graphics.setColor(mapC[i].r, mapC[i].g, mapC[i].b, mapC[i].a)
-			love.graphics.rectangle(map[i].mode, drawX, drawY, squareSize, squareSize)
+		love.graphics.setColor(mapC[i].r, mapC[i].g, mapC[i].b, mapC[i].a)
+		love.graphics.rectangle(map[i].mode, drawX, drawY, squareSize, squareSize)
 	end
 end
 
 function mapFunc:checkAdjacent(tile1)
-	local tileOutput = {}
+	adjTileOutput = {}
 	local blank = 0
 	local b = tile1
 
 	for i = 1,gridSize^2 do
-
 		for q = -1,1 do
 
 			tileOne = b+q
 			tileTwo = b-gridSize+q
 			tileThree = b+gridSize+q
-			--print('tileOne: '..tileOne..' tileTwo: '..tileTwo..' tileThree: '..tileThree)
-			--print(map[b].row)
-			--print(map[b].column)
-			if tileOne > 0 and map[tileOne].column == map[b].column+q then
-				table.insert(tileOutput, tileOne)
+
+			bColumn = b%gridSize
+			tileOneColumn = tileOne%gridSize
+			tileTwoColumn = tileTwo%gridSize
+			tileThreeColumn = tileThree%gridSize
+
+			if tileOne > 0 and tileOneColumn == bColumn+q then
+				table.insert(adjTileOutput, tileOne)
 			end
-			if tileTwo > 0 and map[tileOne].column == map[b].column+q then
-				table.insert(tileOutput, tileTwo)
+			if tileTwo > 0 and tileOneColumn == bColumn+q then
+				table.insert(adjTileOutput, tileTwo)
 			end
-			if tileThree > 0 and map[tileOne].column == map[b].column+q then
-				table.insert(tileOutput, tileThree)
+			if tileThree > 0 and tileOneColumn == bColumn+q then
+				table.insert(adjTileOutput, tileThree)
 			end
 		end
 	end
-	return tileOutput
+	adjOutput = {}
+	for i = 1,9 do
+		table.insert(adjOutput, adjTileOutput[i])
+	end
+	--return adjTileOutput
 end
 
 function mapFunc:cameraMovement(dx, dy)

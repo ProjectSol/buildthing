@@ -25,16 +25,17 @@ function createMap:loadMapEditor()
 		local a = math.floor((i-1)/typeGridSize)
 		local drawY = squareSize*a + (1*a)
 		local drawX = love.graphics:getWidth()-(squareSize*8)
-		local tile = {mode = 'fill', x = drawX, y = drawY, type = types[i], num = i}
+		local tile = {mode = 'fill', x = drawX, y = drawY+150, type = types[i], num = i}
 		table.insert(typeSwap, tile)
 	end
 	local i = #typeSwap+1
 	local a = math.floor((i-1)/typeGridSize)
-	local drawY = squareSize*a + (1*a)-(squareSize/2)
+	local drawY = squareSize*a + (1*a)-(squareSize/2)+150
 	local drawX = love.graphics:getWidth()-(squareSize*10)-(squareSize/4)
 	saveTile = {mode = 'fill', x = drawX-squareSize, y = drawY+squareSize, type = save}
 	local saveButton = 'Save Map'
 	textDraw:delayedNewText(saveButton, 3)
+	eggs = true
 end
 
 function createMap:generateWater(tile)
@@ -69,12 +70,21 @@ function createMap:assignSquares()
 end
 
 function createMap:recordMap()
-	--if saveTile then
-		--if checkCollision(saveTile.x, saveTile.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
-			table.save(map, currMap)
-			print('It\'s commented out')
-		--end
-	--end
+	if saveTile then
+		if checkCollision(saveTile.x, saveTile.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
+			--[[table.save(map, europe)
+			gamma = true
+			print('It\'s commented out')]]
+			
+			--[[love.filesystem.setIdentity('buildthing/maps')
+		  data = { _fileName = "Europe.txt", map }
+		  tsuccess = jupiter.save(data)
+		  if tsuccess then
+		    newData = jupiter.load("Europe.txt")
+		    green = true
+		  end]]
+		end
+	end
 end
 
 return createMap

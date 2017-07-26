@@ -474,7 +474,7 @@ function UI:symbols()
       --cityPanel1:setText('')
     end
   end
-  cityName = 'test'
+  cityName = 'Something Broke'
   local cityPanel2 = gui.create( "label" )
   cityPanel2:setPos( 5,love.graphics:getHeight()/16 )
   cityPanel2:setSize( 501,love.graphics:getHeight()-love.graphics:getHeight()/16-40 )
@@ -492,6 +492,37 @@ function UI:symbols()
       cityPanel2:setText('')
     end
   end
+  tenthMeasure = love.graphics:getHeight()/10
+  local cityPanel3 = gui.create( "button" )
+  cityPanel3:setPos( 20,tenthMeasure )
+  cityPanel3:setSize( 150, 30 )
+  --love.graphics.setLineWidth(2)
+  function cityPanel3:paint(w, h)
+    if cityPanel1Display then
+      cityPanel3:setTextColor(80, 80, 80)
+      love.graphics.setColor(125, 125, 125, 200)
+      love.graphics.rectangle( "fill", 0, 0, w, h )
+      cityPanel3:setTextOffset(0,0)
+      cityPanel3:setFont(status)
+      cityPanel3:setText("Build Infantry")
+    else
+      cityPanel3:setText("")
+    end
+  end
+  function cityPanel3:doClick()
+    if currBuildCity.building == false then
+      local c = love.math.random(-1,1)
+      local m = love.math.random(-1,1)
+      local g = (gridSize*m)+c
+      local f = currBuildCity.loc+g
+      turnTimer:addUnitBuildOrder(currBuildCity.team, f, 2)
+    end
+  end
+
+
+
+
+
 
   local unitPanel1 = gui.create( "panel" )
   unitPanel1:setSize( 500, love.graphics:getHeight()-love.graphics:getHeight()/16-40 )
@@ -521,6 +552,44 @@ function UI:symbols()
       unitPanel2:setText('')
     end
   end
+
+
+
+
+
+
+  local passTurn = gui.create( "button" )
+  passTurn:setPos( love.graphics:getWidth()-325, 0 )
+  passTurn:setSize( 95, 30 )
+  --love.graphics.setLineWidth(2)
+  function passTurn:paint(w, h)
+    passTurn:setTextColor(255, 255, 255)
+    love.graphics.setColor(0, 0, 200, 255)
+    love.graphics.rectangle( "fill", 0, 0, w, h )
+    passTurn:setTextOffset(0,0)
+    passTurn:setFont(status)
+    passTurn:setText("Pass Turn")
+  end
+  function passTurn:doClick()
+    turnTimer:exectueLog()
+  end
+
+  local autoTurn = gui.create( "button" )
+  autoTurn:setPos( love.graphics:getWidth()-220, 0 )
+  autoTurn:setSize( 95, 30 )
+  --love.graphics.setLineWidth(2)
+  function autoTurn:paint(w, h)
+    autoTurn:setTextColor(255, 255, 255)
+    love.graphics.setColor(0, 200, 0, 255)
+    love.graphics.rectangle( "fill", 0, 0, w, h )
+    autoTurn:setTextOffset(0,0)
+    autoTurn:setFont(status)
+    autoTurn:setText("Auto Turn")
+  end
+  function autoTurn:doClick()
+    turnTimer:switchTurnMode()
+  end
+
 end
 
 function UI:drawStatusBar()
@@ -555,6 +624,10 @@ function UI:displayUnitPage()
       if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
         unitPanelDisplay = true
         unitName = units[i].name
+        notUnselected = false
+        for k = 1,#units do
+          units[k].selected = 0
+        end
         break
       else
         unitPanelDisplay = false
@@ -563,20 +636,28 @@ function UI:displayUnitPage()
   end
 end
 
+function UI:checkDoubleClickMapFalse()
+  blockRun = true
+end
+
 function UI:checkDoubleClickMap()
-  if clickTF == true then
-    if love.timer.getTime() <= clickTime then
-      clickTF = false
-      return true
+  if blockRun == false then
+    if clickTF == true then
+      if love.timer.getTime() <= clickTime then
+        clickTF = false
+        return true
+      else
+        clickTF = true
+        clickTime = love.timer.getTime()+0.45
+        return false
+      end
     else
       clickTF = true
-      clickTime = love.timer.getTime()+1
+      clickTime = love.timer.getTime()+0.45
       return false
     end
   else
-    clickTF = true
-    clickTime = love.timer.getTime()+1
-    return false
+    blockRun = false
   end
 end
 
@@ -587,12 +668,18 @@ function UI:displayCityPage()
       createMap:genTilePos(loc)
       worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
       localX, localY = love.mouse.getPosition()
-      if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-        cityPanel1Display = true
-        cityPanel2Display = true
+        if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
+          cityPanel1Display = true
+          cityPanel2Display = true
+          for k = 1,#cities do
+            if cities[k].loc == i then
+              cityName = cities[k].name
+            end
+            currBuildCity = cities[k]
+          end
+        break
         --cityName = cities[i].name
         --cityProduction = cities[i].production
-        break
       else
         cityPanel1Display = false
         cityPanel2Display = false
