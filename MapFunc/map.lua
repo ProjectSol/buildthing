@@ -10,8 +10,17 @@ end
 
 function mapFunc:pullMapData()
 	love.filesystem.setIdentity('buildthing/maps')
-	local mapl = jupiter.load("Europe.txt")
-	map = mapl[1]
+
+--[[
+	mapLoading = table.load(europe)
+	local data = { _fileName = "Europe.txt", mapLoading }
+	tsuccess = jupiter.save(data)
+	if tsuccess then
+		local mapl = jupiter.load("Europe.txt")
+		map = mapl[1]
+	else
+		print('something fucked up')
+	end]]
 	--[[map = table.load(currMap)]]
 	print('dude game sux: '..#map)
 end
@@ -50,7 +59,7 @@ function mapFunc:drawMapEditor()
 	end
 	love.graphics.setColor(saveTile.r, saveTile.g, saveTile.b, saveTile.a)
 	love.graphics.rectangle(saveTile.mode, saveTile.x, saveTile.y, saveButtonW, saveButtonH)
-	textDraw:delayDraw(3, 0.05, saveTile.x+(saveButtonH/4), saveTile.y+(saveButtonH/4), mainFont)
+	textDraw:delayDraw(3, 0.25, saveTile.x+(saveButtonH/4), saveTile.y+(saveButtonH/4), mainFont)
 	for i = 1,#typeSwap do
 
 		if checkCollision(typeSwap[i].x, typeSwap[i].y, squareSize, squareSize, localX, localY, 1, 1) then

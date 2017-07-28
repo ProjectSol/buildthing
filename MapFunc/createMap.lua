@@ -54,6 +54,12 @@ function createMap:assignSquares()
 	local down = love.mouse.isDown(1)
 	if mapEditor then
 		if currType ~= 'save' then
+			for i = 1,#typeSwap do
+				if checkCollision(typeSwap[i].x, typeSwap[i].y, squareSize, squareSize, localX, localY, 1, 1) and down then
+					currType = typeSwap[i].type
+				end
+			end
+			
 		  for i = 1,#map do
 				createMap:genTilePos(i)
 		    if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) and down then
@@ -61,21 +67,22 @@ function createMap:assignSquares()
 		    end
 		  end
 		end
-		for i = 1,#typeSwap do
-			if checkCollision(typeSwap[i].x, typeSwap[i].y, squareSize, squareSize, localX, localY, 1, 1) and down then
-				currType = typeSwap[i].type
-			end
-		end
 	end
 end
 
 function createMap:recordMap()
 	if saveTile then
 		if checkCollision(saveTile.x, saveTile.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
+			love.filesystem.setIdentity('buildthing/maps')
+			love.filesystem.write("TestTable.lua",LuaTable.encode({test=true}))
+			local TableCode = love.filesystem.read("TestTable.lua")
+			local TableData = LuaTable.decode(TableCode)
+			dbugPrint = tableData
+
 			--[[table.save(map, europe)
 			gamma = true
 			print('It\'s commented out')]]
-			
+
 			--[[love.filesystem.setIdentity('buildthing/maps')
 		  data = { _fileName = "Europe.txt", map }
 		  tsuccess = jupiter.save(data)

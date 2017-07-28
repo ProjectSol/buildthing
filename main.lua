@@ -12,6 +12,9 @@ require "Empire/cityCreation"
 require "Empire/unitFunc"
 require "Systems/turnTimer"
 jupiter = require "SaveTableToFile/Jupiter-master/jupiter"
+LuaTable = require("SaveTableToFile/LuaTable")
+lg = love.graphics
+
 --require "Serial-master/serial"
 
 
@@ -22,9 +25,9 @@ jupiter = require "SaveTableToFile/Jupiter-master/jupiter"
 		for i = 1,#map do
 			createMap:genTilePos(i)
 			if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-				love.graphics.setFont(debugFont)
-				love.graphics.print(i%gridSize, 200, 500)
-				love.graphics.print(math.ceil(i/gridSize), 200, 600)
+				lg.setFont(debugFont)
+				lg.print(i%gridSize, 200, 500)
+				lg.print(math.ceil(i/gridSize), 200, 600)
 			end
 		end
 	end
@@ -136,26 +139,20 @@ function love.load()
 	teamColours()
 	mapDeclarations()
 	loadFiles('UI/gui')
-	mapFunc:pullMapData()
+	--mapFunc:pullMapData()
 	m = 0
 	counter = 0
 	world = love.physics.newWorld(0, 0, true)
 	mapFunc:defineColours()
-	--createMap:loadGrid()
+	createMap:loadGrid()
 	loopTable = true
-	--createMap:loadMapEditor()
+	createMap:loadMapEditor()
 	mapFunc:mapColour()
-	Camera = camera(love.graphics:getWidth()/2, love.graphics:getHeight()/2-31)
+	Camera = camera(lg:getWidth()/2, lg:getHeight()/2-31)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
 	CITY:gameStart()
 	unitFunc:gameStart()
-	--[[mapFunc:checkAdjacent(54)
-	yes = ''
-	for i = 1,#adjOutput do
-		yes = yes..' '..adjOutput[i]
-	end]]
-
 
 	UI:updateDisplay()
 	UI:symbols()
@@ -181,13 +178,13 @@ function love.update()
 	gui.update()
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
-	--createMap:assignSquares()
+	createMap:assignSquares()
 end
 
 function love.mousepressed(x, y, button, istouch)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
-	--createMap:recordMap()
+	createMap:recordMap()
 	notUnselected = true
 	if UI:checkDoubleClickMap() then
 		UI:displayCityPage()
@@ -238,24 +235,24 @@ textDraw:delayedNewText(line1, 1)
 textDraw:delayedNewText(line2, 2)
 
 function debugPrint()
-	dbugPrint = 'THIS IS A LONG SENTENCE SERVING NO REAL PURPOSE'
+	dbugPrint = nil
 	if dbugPrint then
-		love.graphics.setFont(debugFont)
-		love.graphics.setColor(0,0,0)
-		love.graphics.print(dbugPrint, 900, 900)
+		lg.setFont(debugFont)
+		lg.setColor(0,0,0)
+		lg.print(dbugPrint, 45*lg:getWidth()/100, 45*lg:getHeight()/100)
 	else
-		love.graphics.setFont(debugFont)
-		love.graphics.setColor(0,0,0)
-		love.graphics.print("nothing", 900, 900)
+		lg.setFont(debugFont)
+		lg.setColor(0,0,0)
+		lg.print("", 45*lg:getWidth()/100, 45*lg:getHeight()/100)
 	end
 end
 
 
 function displayTurnLog()
 	for i = 1,#turnLog do
-		love.graphics.setFont(status)
-		love.graphics.setColor(50, 50, 50)
-		love.graphics.print(turnLog[i][1], love.graphics:getWidth()*0.9, love.graphics:getHeight()-(20*i)-20)
+		lg.setFont(status)
+		lg.setColor(50, 50, 50)
+		lg.print(turnLog[i][1], lg:getWidth()*0.9, lg:getHeight()-(20*i)-20)
 	end
 end
 
@@ -265,40 +262,40 @@ function love.draw()
 	unitFunc:drawMovRadius()
 	UI:drawUnits()
 	--Some old debugging stuff
-		--[[love.graphics.print(adjTileOutput[2], 990, 0)
-		love.graphics.setColor(50,50,80)
-		love.graphics.print(adjTileOutput[3]..' this is num 3', 0, 100)
-		love.graphics.print(adjTileOutput[4], 990, 100)]]
+		--[[lg.print(adjTileOutput[2], 990, 0)
+		lg.setColor(50,50,80)
+		lg.print(adjTileOutput[3]..' this is num 3', 0, 100)
+		lg.print(adjTileOutput[4], 990, 100)]]
 
 	Camera:detach()
 	displayTurnLog()
-	--mapFunc:drawMapEditor()
+	mapFunc:drawMapEditor()
 	--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
   --textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
-	--love.graphics.print(counter, 0,10)
+	--lg.print(counter, 0,10)
 	UI:drawUI()
-	debugPrint()
-	love.graphics.setBackgroundColor(200, 200, 200, 255)
-	love.graphics.setFont(font)
-	love.graphics.setColor(150, 0, 0)
+	lg.setBackgroundColor(200, 200, 200, 255)
+	lg.setFont(font)
+	lg.setColor(150, 0, 0)
 	fps = tostring(love.timer.getFPS())
-	love.graphics.print("Current FPS: "..fps, love.graphics:getWidth()-150, 16)
+	lg.print("Current FPS: "..fps, lg:getWidth()-150, 16)
 	--[[if active == true then
 		gamma = 'no tile selected'
 		for i = 1,#units do
 			if units[i].selected == 1 then
-				love.graphics.setFont(debugFont)
+				lg.setFont(debugFont)
 				gamma = tostring(units[i].location)
 			end
 		end
 	end]]
-	--love.graphics.print(gamma or '',0,100)
-	--love.graphics.setColor(200, 50, 50)
+	--lg.print(gamma or '',0,100)
+	--lg.setColor(200, 50, 50)
 	--dotheotherthing()
 	gui.draw()
 	if green then
-	love.graphics.print(love.filesystem.getSaveDirectory() or 'god damnit')
+	lg.print(love.filesystem.getSaveDirectory() or 'god damnit')
 	end
-	love.graphics.setColor(10,10,10,255)
-	love.graphics.print("Alpha 0.0.5", love.graphics:getWidth()-95, (98*love.graphics:getHeight())/100)
+	lg.setColor(10,10,10,255)
+	lg.print("Alpha 0.0.5", lg:getWidth()-95, (98*lg:getHeight())/100)
+	debugPrint()
 end
