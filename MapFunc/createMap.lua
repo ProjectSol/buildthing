@@ -59,7 +59,7 @@ function createMap:assignSquares()
 					currType = typeSwap[i].type
 				end
 			end
-			
+
 		  for i = 1,#map do
 				createMap:genTilePos(i)
 		    if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) and down then
@@ -77,7 +77,7 @@ function createMap:recordMap()
 			love.filesystem.write("TestTable.lua",LuaTable.encode({test=true}))
 			local TableCode = love.filesystem.read("TestTable.lua")
 			local TableData = LuaTable.decode(TableCode)
-			dbugPrint = tableData
+			--dbugPrint = tableData
 
 			--[[table.save(map, europe)
 			gamma = true

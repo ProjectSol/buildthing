@@ -12,7 +12,7 @@ require "Empire/cityCreation"
 require "Empire/unitFunc"
 require "Systems/turnTimer"
 jupiter = require "SaveTableToFile/Jupiter-master/jupiter"
-LuaTable = require("SaveTableToFile/LuaTable")
+luaTable = require("SaveTableToFile/LuaTable")
 lg = love.graphics
 
 --require "Serial-master/serial"
@@ -39,7 +39,7 @@ function mapDeclarations()
 	mapC = {}
 	player = {}
 	player.resources = {money = 10000, metal = 5000, food = 100, tradeGoods = 40, luxuries = 5, ammunition = 50000, waste = 0}
-	player.income = {money = 100, metal = 6, food = 500, tradeGoods = 3, luxuries = -4, ammunition = 150, waste = 0.05}
+	player.income = {money = 0, metal = 0, food = 0, tradeGoods = 0, luxuries = 0, ammunition = 0, waste = 0}
 	gridSize = 35
 	squareSize = 40
 	startX, startY = 0,0
@@ -139,16 +139,21 @@ function love.load()
 	teamColours()
 	mapDeclarations()
 	loadFiles('UI/gui')
-	--mapFunc:pullMapData()
+	mapFunc:pullMapData()
 	m = 0
 	counter = 0
 	world = love.physics.newWorld(0, 0, true)
 	mapFunc:defineColours()
-	createMap:loadGrid()
+	--createMap:loadGrid()
 	loopTable = true
-	createMap:loadMapEditor()
+	--createMap:loadMapEditor()
 	mapFunc:mapColour()
-	Camera = camera(lg:getWidth()/2, lg:getHeight()/2-31)
+	local centred = lg:getWidth() - (gridSize*squareSize+gridSize)
+	if centred >= 0 then
+		Camera = camera(lg:getWidth()/2-centred/2, lg:getHeight()/2-31)
+	else
+		Camera = camera(lg:getWidth()/2, lg:getHeight()/2-31)
+	end
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
 	CITY:gameStart()
@@ -178,13 +183,13 @@ function love.update()
 	gui.update()
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
-	createMap:assignSquares()
+	--createMap:assignSquares()
 end
 
 function love.mousepressed(x, y, button, istouch)
 	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 	localX, localY = love.mouse.getPosition()
-	createMap:recordMap()
+	--createMap:recordMap()
 	notUnselected = true
 	if UI:checkDoubleClickMap() then
 		UI:displayCityPage()
@@ -234,8 +239,10 @@ line2 = 'See above and come to your own conclusion'
 textDraw:delayedNewText(line1, 1)
 textDraw:delayedNewText(line2, 2)
 
+
+--dbugPrint = nil
+dbugPrint = nil
 function debugPrint()
-	dbugPrint = nil
 	if dbugPrint then
 		lg.setFont(debugFont)
 		lg.setColor(0,0,0)
@@ -269,7 +276,7 @@ function love.draw()
 
 	Camera:detach()
 	displayTurnLog()
-	mapFunc:drawMapEditor()
+	--mapFunc:drawMapEditor()
 	--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
   --textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
 	--lg.print(counter, 0,10)

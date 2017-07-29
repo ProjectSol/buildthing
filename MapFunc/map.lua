@@ -9,20 +9,36 @@ function mapFunc:defineColours()
 end
 
 function mapFunc:pullMapData()
+	--dbugPrint = tostring(love.filesystem.isFused())
 	love.filesystem.setIdentity('buildthing/maps')
+	--[[mapLoading = table.load(europe)
+	local data = { _fileName = "Europa.txt", mapLoading }
+	tsuccess = jupiter.save(data)]]
 
---[[
-	mapLoading = table.load(europe)
-	local data = { _fileName = "Europe.txt", mapLoading }
-	tsuccess = jupiter.save(data)
-	if tsuccess then
+	--table.save(map, "europa") This was used to save the initial map
+
+	local f = love.filesystem.isFile("Europe.txt")
+	if f then
 		local mapl = jupiter.load("Europe.txt")
 		map = mapl[1]
 	else
-		print('something fucked up')
-	end]]
-	--[[map = table.load(currMap)]]
-	print('dude game sux: '..#map)
+		mapf = table.load("europa")
+		print(#mapf)
+		if mapf then
+			dbugPrint = tostring(#mapf)
+		else
+			print('niggers')
+			dbugPrint = 'niggers'
+		end
+		local data = { _fileName = "Europe.txt", mapf }
+		yes = jupiter.save(data)
+		if yes then
+			local mapl = jupiter.load("Europe.txt")
+			map = mapl[1]
+			print('gamma')
+			dbugPrint = "Simply the best"
+		end
+	end
 end
 
 function checkInLine(tile1, tile2)
@@ -59,7 +75,7 @@ function mapFunc:drawMapEditor()
 	end
 	love.graphics.setColor(saveTile.r, saveTile.g, saveTile.b, saveTile.a)
 	love.graphics.rectangle(saveTile.mode, saveTile.x, saveTile.y, saveButtonW, saveButtonH)
-	textDraw:delayDraw(3, 0.25, saveTile.x+(saveButtonH/4), saveTile.y+(saveButtonH/4), mainFont)
+	textDraw:delayDraw(3, 0.095, saveTile.x+(saveButtonH/4), saveTile.y+(saveButtonH/4), mainFont)
 	for i = 1,#typeSwap do
 
 		if checkCollision(typeSwap[i].x, typeSwap[i].y, squareSize, squareSize, localX, localY, 1, 1) then
@@ -190,22 +206,46 @@ function mapFunc:cameraMovement(dx, dy)
 		xCamLimit = gridSize*squareSize+gridSize--+love.graphics:getWidth()/2
 		yCamLimit = gridSize*squareSize+gridSize
 		Camera:move(-dx, -dy)
-		local cx, cy = Camera:position()
-		if cx - dx <= love.graphics:getWidth()/2 then
-			Camera:lookAt(love.graphics:getWidth()/2, cy)
-			cx, cy = Camera:position()
+		if gridSize*squareSize+gridSize >= lg:getWidth() then
+			local cx, cy = Camera:position()
+			--left
+			if cx - dx <= love.graphics:getWidth()/2-41 then
+				Camera:lookAt(love.graphics:getWidth()/2-41, cy)
+				cx, cy = Camera:position()
+			end
+			--right
+			if cx - dx >= xCamLimit-love.graphics:getWidth()/2+41 then
+				Camera:lookAt(xCamLimit-love.graphics:getWidth()/2+41, cy)
+				cx, cy = Camera:position()
+			end
+			--up
+			if cy - dy <= love.graphics:getHeight()/2-71 then
+				Camera:lookAt(cx, love.graphics:getHeight()/2-71)
+				cx, cy = Camera:position()
+			end
+			--down
+			if cy - dy >= yCamLimit-love.graphics:getHeight()/2+40 then
+				Camera:lookAt(cx, yCamLimit-love.graphics:getHeight()/2+40)
+				cx, cy = Camera:position()
+			end
+
 		end
-		if cx - dx >= xCamLimit-love.graphics:getWidth()/2+1 then
-			Camera:lookAt(xCamLimit-love.graphics:getWidth()/2+1, cy)
-			cx, cy = Camera:position()
-		end
-		if cy - dy <= love.graphics:getHeight()/2-31 then
-			Camera:lookAt(cx, love.graphics:getHeight()/2-31)
-			cx, cy = Camera:position()
-		end
-		if cy - dy >= yCamLimit-love.graphics:getHeight()/2 then
-			Camera:lookAt(cx, yCamLimit-love.graphics:getHeight()/2)
-			cx, cy = Camera:position()
+
+		if gridSize*squareSize+gridSize < lg:getWidth() then
+			local centred = lg:getWidth() - (gridSize*squareSize+gridSize)
+			local cx, cy = Camera:position()
+			Camera:lookAt(lg:getWidth()/2-centred/2, cy)
+			local cx,cy = Camera:position()
+
+
+			if cy - dy <= love.graphics:getHeight()/2-71 then
+				Camera:lookAt(cx, love.graphics:getHeight()/2-71)
+				cx, cy = Camera:position()
+			end
+			if cy - dy >= yCamLimit-love.graphics:getHeight()/2+40 then
+				Camera:lookAt(cx, yCamLimit-love.graphics:getHeight()/2+40)
+				cx, cy = Camera:position()
+			end
 		end
 	end
 end
