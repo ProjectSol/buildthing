@@ -513,7 +513,7 @@ function UI:symbols()
     if currBuildCity.building == false then
       local c = love.math.random(-1,1)
       local m = love.math.random(-1,1)
-      local g = (gridSize*m)+c
+      local g = (gridSize*m)+c 
       local f = currBuildCity.loc+g
       turnTimer:addUnitBuildOrder(currBuildCity.team, f, 2)
     end

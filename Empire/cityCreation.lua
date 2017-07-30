@@ -8,7 +8,7 @@ end
 function CITY.create(num)
 
 end
-
+ 
 function CITY.getUnhappiness()
   unhappinessTotal = 3
   self.unhappiness = unhappinessTotal

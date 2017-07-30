@@ -10,7 +10,7 @@ function unitFunc:gameStart()
       if map[loc2] then
         if map[loc2].type ~= 'water' then
           unitFunc:spawnInfantry(loc2, cities[i].team)
-          a = false
+          a = false 
         end
       end
     end

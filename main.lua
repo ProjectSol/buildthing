@@ -271,7 +271,6 @@ function debugPrint()
 	else
 		lg.setFont(debugFont)
 		lg.setColor(0,0,0)
-		local a = status:getWidth( dbugPrint )
 		lg.print("", 45*lg:getWidth()/100, 45*lg:getHeight()/100)
 	end
 end
