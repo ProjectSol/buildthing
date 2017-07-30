@@ -139,29 +139,35 @@ function love.load()
 	teamColours()
 	mapDeclarations()
 	loadFiles('UI/gui')
+	bypass = false
 	mapFunc:pullMapData()
-	m = 0
-	counter = 0
-	world = love.physics.newWorld(0, 0, true)
-	mapFunc:defineColours()
-	--createMap:loadGrid()
-	loopTable = true
-	--createMap:loadMapEditor()
-	mapFunc:mapColour()
-	local centred = lg:getWidth() - (gridSize*squareSize+gridSize)
-	if centred >= 0 then
-		Camera = camera(lg:getWidth()/2-centred/2, lg:getHeight()/2-31)
-	else
-		Camera = camera(lg:getWidth()/2, lg:getHeight()/2-31)
-	end
-	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
-	localX, localY = love.mouse.getPosition()
-	CITY:gameStart()
-	unitFunc:gameStart()
+	if not bypass then
+		m = 0
+		counter = 0
+		world = love.physics.newWorld(0, 0, true)
+		mapFunc:defineColours()
+		--createMap:loadGrid()
+		loopTable = true
+		--createMap:loadMapEditor()
+		mapFunc:mapColour()
+		local centred = lg:getWidth() - (gridSize*squareSize+gridSize)
+		if centred >= 0 then
+			Camera = camera(lg:getWidth()/2-centred/2, lg:getHeight()/2-31)
+		else
+			Camera = camera(lg:getWidth()/2, lg:getHeight()/2-31)
+		end
+		worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
+		localX, localY = love.mouse.getPosition()
+		CITY:gameStart()
+		unitFunc:gameStart()
 
-	UI:updateDisplay()
-	UI:symbols()
-	UI:loadDescriptions()
+		UI:updateDisplay()
+		UI:symbols()
+		UI:loadDescriptions()
+	end
+	if bypass then
+		dbugPrint = "Map data has been saved, please press escape and relaunch to play"
+	end
 end
 
 function checkCollision(x1,y1,w1,h1, x2,y2,w2,h2)
@@ -172,49 +178,59 @@ function checkCollision(x1,y1,w1,h1, x2,y2,w2,h2)
 end
 
 function love.mousemoved( x, y, dx, dy, istouch )
-	mapFunc:cameraMovement(dx, dy)
+	if not bypass then
+		mapFunc:cameraMovement(dx, dy)
+	end
 end
 
 function love.update()
-	--clickTime = love.timer.getTime()
-	if love.timer.getTime() > clickTime then
-		clickTF = false
+	if not bypass then
+		--clickTime = love.timer.getTime()
+		if love.timer.getTime() > clickTime then
+			clickTF = false
+		end
+		gui.update()
+		worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
+		localX, localY = love.mouse.getPosition()
+		--createMap:assignSquares()
 	end
-	gui.update()
-	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
-	localX, localY = love.mouse.getPosition()
-	--createMap:assignSquares()
 end
 
 function love.mousepressed(x, y, button, istouch)
-	worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
-	localX, localY = love.mouse.getPosition()
-	--createMap:recordMap()
-	notUnselected = true
-	if UI:checkDoubleClickMap() then
-		UI:displayCityPage()
-		UI:displayUnitPage()
-	end
-	mapFunc:mapColour()
-	for k = 1,#map do
-		createMap:genTilePos(k)
-		if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-			unitFunc:move(k)
-			if notUnselected then
-				unitFunc:select()
+	if not bypass then
+		worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
+		localX, localY = love.mouse.getPosition()
+		--createMap:recordMap()
+		notUnselected = true
+		if UI:checkDoubleClickMap() then
+			UI:displayCityPage()
+			UI:displayUnitPage()
+		end
+		mapFunc:mapColour()
+		for k = 1,#map do
+			createMap:genTilePos(k)
+			if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
+				unitFunc:move(k)
+				if notUnselected then
+					unitFunc:select()
+				end
 			end
 		end
-	end
 
-	gui.buttonCheck( x, y, button )
+		gui.buttonCheck( x, y, button )
+	end
 end
 
 function love.mousereleased(x, y, button, isTouch)
-	gui.buttonReleased( x, y, button, istouch )
+	if not bypass then
+		gui.buttonReleased( x, y, button, istouch )
+	end
 end
 
 function love.wheelmoved(dx, dy)
-	gui.wheelMoved( dx, dy )
+	if not bypass then
+		gui.wheelMoved( dx, dy )
+	end
 end
 
 function love.keypressed(key)
@@ -246,10 +262,16 @@ function debugPrint()
 	if dbugPrint then
 		lg.setFont(debugFont)
 		lg.setColor(0,0,0)
-		lg.print(dbugPrint, 45*lg:getWidth()/100, 45*lg:getHeight()/100)
+		if bypass then
+			lg.setColor(255,255,255)
+			lg.setFont(status)
+		end
+		local a = status:getWidth( dbugPrint )
+		lg.print(dbugPrint, 45*lg:getWidth()/100-a, 45*lg:getHeight()/100-a)
 	else
 		lg.setFont(debugFont)
 		lg.setColor(0,0,0)
+		local a = status:getWidth( dbugPrint )
 		lg.print("", 45*lg:getWidth()/100, 45*lg:getHeight()/100)
 	end
 end
@@ -264,45 +286,47 @@ function displayTurnLog()
 end
 
 function love.draw()
-	Camera:attach()
-	mapFunc:drawMap()
-	unitFunc:drawMovRadius()
-	UI:drawUnits()
-	--Some old debugging stuff
-		--[[lg.print(adjTileOutput[2], 990, 0)
-		lg.setColor(50,50,80)
-		lg.print(adjTileOutput[3]..' this is num 3', 0, 100)
-		lg.print(adjTileOutput[4], 990, 100)]]
+	if not bypass then
+		Camera:attach()
+		mapFunc:drawMap()
+		unitFunc:drawMovRadius()
+		UI:drawUnits()
+		--Some old debugging stuff
+			--[[lg.print(adjTileOutput[2], 990, 0)
+			lg.setColor(50,50,80)
+			lg.print(adjTileOutput[3]..' this is num 3', 0, 100)
+			lg.print(adjTileOutput[4], 990, 100)]]
 
-	Camera:detach()
-	displayTurnLog()
-	--mapFunc:drawMapEditor()
-	--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
-  --textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
-	--lg.print(counter, 0,10)
-	UI:drawUI()
-	lg.setBackgroundColor(200, 200, 200, 255)
-	lg.setFont(font)
-	lg.setColor(150, 0, 0)
-	fps = tostring(love.timer.getFPS())
-	lg.print("Current FPS: "..fps, lg:getWidth()-150, 16)
-	--[[if active == true then
-		gamma = 'no tile selected'
-		for i = 1,#units do
-			if units[i].selected == 1 then
-				lg.setFont(debugFont)
-				gamma = tostring(units[i].location)
+		Camera:detach()
+		displayTurnLog()
+		--mapFunc:drawMapEditor()
+		--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
+	  --textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
+		--lg.print(counter, 0,10)
+		UI:drawUI()
+		lg.setBackgroundColor(200, 200, 200, 255)
+		lg.setFont(font)
+		lg.setColor(150, 0, 0)
+		fps = tostring(love.timer.getFPS())
+		lg.print("Current FPS: "..fps, lg:getWidth()-150, 16)
+		--[[if active == true then
+			gamma = 'no tile selected'
+			for i = 1,#units do
+				if units[i].selected == 1 then
+					lg.setFont(debugFont)
+					gamma = tostring(units[i].location)
+				end
 			end
+		end]]
+		--lg.print(gamma or '',0,100)
+		--lg.setColor(200, 50, 50)
+		--dotheotherthing()
+		gui.draw()
+		if green then
+		lg.print(love.filesystem.getSaveDirectory() or 'god damnit')
 		end
-	end]]
-	--lg.print(gamma or '',0,100)
-	--lg.setColor(200, 50, 50)
-	--dotheotherthing()
-	gui.draw()
-	if green then
-	lg.print(love.filesystem.getSaveDirectory() or 'god damnit')
+		lg.setColor(10,10,10,255)
+		lg.print("Alpha 0.0.5", lg:getWidth()-95, (98*lg:getHeight())/100)
 	end
-	lg.setColor(10,10,10,255)
-	lg.print("Alpha 0.0.5", lg:getWidth()-95, (98*lg:getHeight())/100)
 	debugPrint()
 end

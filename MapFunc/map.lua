@@ -21,8 +21,15 @@ function mapFunc:pullMapData()
 	if f then
 		local mapl = jupiter.load("Europe.txt")
 		map = mapl[1]
+		gamma = json.encode(map)
+		--love.filesystem.write( "fuckme.txt", gamma )
 	else
-		mapf = table.load("europa")
+		require "IHateEverything"
+		local mapl = json.decode(mapSave)
+		local data = { _fileName = "Europe.txt", mapl }
+		tsuccess = jupiter.save(data)
+		bypass = true
+		--[[mapf = table.load("europa")
 		print(#mapf)
 		if mapf then
 			dbugPrint = tostring(#mapf)
@@ -37,7 +44,7 @@ function mapFunc:pullMapData()
 			map = mapl[1]
 			print('gamma')
 			dbugPrint = "Simply the best"
-		end
+		end]]
 	end
 end
 
