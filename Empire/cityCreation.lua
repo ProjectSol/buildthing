@@ -8,7 +8,7 @@ end
 function CITY.create(num)
 
 end
- 
+
 function CITY.getUnhappiness()
   unhappinessTotal = 3
   self.unhappiness = unhappinessTotal
@@ -50,7 +50,7 @@ function CITY:gameStart()
       local loc = i
       local colour = teamColours1[g]
       local building = false
-      local cit = {name = name, loc = loc, team = team, colour = colour}
+      local cit = {name = name, loc = loc, team = team, colour = colour, number = g}
 
       table.insert(cities, cit)
     end

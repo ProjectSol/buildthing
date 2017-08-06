@@ -492,33 +492,61 @@ function UI:symbols()
       cityPanel2:setText('')
     end
   end
-  tenthMeasure = love.graphics:getHeight()/10
+
+  for i = 1,#buttons do
+    local menuButtons = buttons[i] 
+    if checkCollision(menuButtons.x, menuButtons.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
+      menuButtons.r = 150
+      menuButtons.g = 150
+      menuButtons.b = 255
+      menuButtons.a = 200
+    else
+      menuButtons.r = 150
+      menuButtons.g = 150
+      menuButtons.b = 255
+      menuButtons.a = 255
+    end
+    love.graphics.setColor(menuButtons.r, menuButtons.g, menuButtons.b, menuButtons.a)
+    love.graphics.rectangle(menuButtons.mode, menuButtons.x, menuButtons.y, saveButtonW, saveButtonH)
+    textDraw:delayDraw(3, 0.095, menuButtons.x+(saveButtonH/4), menuButtons.y+(saveButtonH/4), mainFont)
+  end
+
+  --i, n, m, bx, by, bw, bh, br, bg, bb, ba, tf, TF, rT, gT, bT
+  --buttonFunc:Setup(1, 'kill me', "line", 20, tenthMeasure, 150, 30, 155, 255, 0, 255, true, true, 255, 255, 255)
+--[[
   local cityPanel3 = gui.create( "button" )
   cityPanel3:setPos( 20,tenthMeasure )
   cityPanel3:setSize( 150, 30 )
   --love.graphics.setLineWidth(2)
   function cityPanel3:paint(w, h)
-    if cityPanel1Display then
+    --if cityPanel3Display then
+      cityPanel3:setPos( 20,tenthMeasure )
+      cityPanel3:setSize( 150, 30 )
       cityPanel3:setTextColor(80, 80, 80)
       love.graphics.setColor(125, 125, 125, 200)
       love.graphics.rectangle( "fill", 0, 0, w, h )
       cityPanel3:setTextOffset(0,0)
       cityPanel3:setFont(status)
-      cityPanel3:setText("Build Infantry")
+    if currBuildCity then
+      cityPanel3:setText('Build Infantry')
     else
-      cityPanel3:setText("")
+      cityPanel3:setText("No city selected")
     end
   end
+  X = 0
   function cityPanel3:doClick()
-    if currBuildCity.building == false then
+    X=X+1
+    dbugPrint = tostring(X)
+    --if currBuildCity and cityPanel3Display then
       local c = love.math.random(-1,1)
       local m = love.math.random(-1,1)
-      local g = (gridSize*m)+c 
-      local f = currBuildCity.loc+g
-      turnTimer:addUnitBuildOrder(currBuildCity.team, f, 2)
-    end
+      local g = (gridSize*m)+c
+      local f = currBuildCity.loc
+      turnTimer:addUnitBuildOrder(currBuildCity.team, f, 2, currBuildCity.number)
+      currBuildCity.building = true
+    --end
   end
-
+]]
 
 
 
@@ -542,7 +570,7 @@ function UI:symbols()
   unitPanel2:setTextOffset(0,10)
   unitPanel2:setFont(status)
   function unitPanel2:paint(w, h)
-    if unitPanelDisplay then
+    if unitPanel2Display then
       love.graphics.setColor( 50, 50, 50 )
       love.graphics.setLineWidth(10)
       love.graphics.rectangle('line', 0, 0, w, h, 10, 10, 20)
@@ -559,7 +587,7 @@ function UI:symbols()
 
 
   local passTurn = gui.create( "button" )
-  passTurn:setPos( love.graphics:getWidth()-325, 0 )
+  passTurn:setPos(105, lg.getHeight()-30 )
   passTurn:setSize( 95, 30 )
   --love.graphics.setLineWidth(2)
   function passTurn:paint(w, h)
@@ -571,11 +599,12 @@ function UI:symbols()
     passTurn:setText("Pass Turn")
   end
   function passTurn:doClick()
+    --dbugPrint = 'passTurn received'
     turnTimer:exectueLog()
   end
 
   local autoTurn = gui.create( "button" )
-  autoTurn:setPos( love.graphics:getWidth()-220, 0 )
+  autoTurn:setPos(0, lg:getHeight()-30 )
   autoTurn:setSize( 95, 30 )
   --love.graphics.setLineWidth(2)
   function autoTurn:paint(w, h)
@@ -595,6 +624,12 @@ end
 function UI:drawStatusBar()
   love.graphics.setColor(0, 20, 60, 255)
   love.graphics.rectangle('fill', 0, 0, love.graphics.getWidth(), 30)
+
+  love.graphics.setColor(0, 20, 60, 255)
+  love.graphics.rectangle('fill', 0, lg:getHeight()-30, love.graphics.getWidth(), 30)
+  love.graphics.setColor(200, 200, 200)
+  love.graphics.setFont(status)
+  love.graphics.print(phase, lg:getWidth()/2-status:getWidth(phase),lg:getHeight()-20)
 
   --text
   love.graphics.setColor(255, 255, 255)
@@ -641,6 +676,7 @@ function UI:checkDoubleClickMapFalse()
 end
 
 function UI:checkDoubleClickMap()
+  local clickDelay = 0.45
   if blockRun == false then
     if clickTF == true then
       if love.timer.getTime() <= clickTime then
@@ -648,12 +684,12 @@ function UI:checkDoubleClickMap()
         return true
       else
         clickTF = true
-        clickTime = love.timer.getTime()+0.45
+        clickTime = love.timer.getTime()+clickDelay
         return false
       end
     else
       clickTF = true
-      clickTime = love.timer.getTime()+0.45
+      clickTime = love.timer.getTime()+clickDelay
       return false
     end
   else
@@ -671,11 +707,14 @@ function UI:displayCityPage()
         if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
           cityPanel1Display = true
           cityPanel2Display = true
+          cityPanel3Display = true
           for k = 1,#cities do
             if cities[k].loc == i then
               cityName = cities[k].name
+              currBuildCity = cities[k]
+              --dbugPrint = k
+              break
             end
-            currBuildCity = cities[k]
           end
         break
         --cityName = cities[i].name
@@ -683,6 +722,7 @@ function UI:displayCityPage()
       else
         cityPanel1Display = false
         cityPanel2Display = false
+        cityPanel3Display = false
       end
     end
   end
@@ -710,6 +750,7 @@ function UI:unitTag(x, y, i)
   love.graphics.setColor(units[i].colour or white)
   local vertices = {x+squareSize-1, y+1, x+squareSize/2, y+1, x+squareSize-1, y+squareSize/2}
   love.graphics.polygon('fill', vertices)
+  --love.graphics.print(tostring(units[i].name),x+i/2,y)
 end
 
 function UI:cityTag(x, y, i)
@@ -722,6 +763,16 @@ function UI:cityTag(x, y, i)
       --love.graphics.polygon('fill', x,y, x-1,y-1, x+1,y+1)
     end
   end
+end
+
+function UI:menuButn()
+  buttons = {}
+  local base = {x=100,y=100,h=30,w=150,colour={125,125,125},name='UNNAMEDBUTTON'}
+  local buildInfantGlobal = base
+  buildInfantGlobal.name = 'Build Infantry'
+  buildInfantGlobal.x = 30
+  buildInfantGlobal.y = tenthMeasure
+
 end
 
 return UI

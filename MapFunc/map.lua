@@ -231,8 +231,8 @@ function mapFunc:cameraMovement(dx, dy)
 				cx, cy = Camera:position()
 			end
 			--down
-			if cy - dy >= yCamLimit-love.graphics:getHeight()/2+40 then
-				Camera:lookAt(cx, yCamLimit-love.graphics:getHeight()/2+40)
+			if cy - dy >= yCamLimit-love.graphics:getHeight()/2+71 then
+				Camera:lookAt(cx, yCamLimit-love.graphics:getHeight()/2+71)
 				cx, cy = Camera:position()
 			end
 

@@ -2,6 +2,9 @@ turnTimer = {}
 
 turnLog = {}
 
+phase = "movement"
+phases = {"movement", "battle"}
+
 function turnTimer:switchTurnMode()
   if autoTurn then
     autoTurn = false
@@ -11,12 +14,13 @@ function turnTimer:switchTurnMode()
 end
 
 function turnTimer:addUnitMoveOrder(team, loc1, loc2, movRange, unit)
-  local unitMove = {"unitMove", team, loc1, loc2, movRange, unit, complete = false}
+  --entry four is the turns remaining so that the formatting for unit building doesn't look all janky
+  local unitMove = {"unitMove", team, loc1, 1, loc2, movRange, unit, complete = false}
   table.insert(turnLog, unitMove)
 end
 
-function turnTimer:addUnitBuildOrder(team, location, turnsRemaning)
-  local unitBuild = {"unitBuild", location, team, turnsRemaning, complete = false}
+function turnTimer:addUnitBuildOrder(team, location, turnsRemaning, city)
+  local unitBuild = {"unitBuild", location, team, turnsRemaning, city, complete = false}
   table.insert(turnLog, unitBuild)
 end
 
@@ -24,18 +28,25 @@ function turnTimer:exectueLog()
   for i = 1,#turnLog do
     local log = turnLog[i]
     local log1 = turnLog[i][1]
-    if log1 == "unitStatusShift" then
-
-    elseif log1 == "unitMove" then
-      unitFunc:turnTickMove(log[3], log[4], log[5], log[6])
-      turnLog[i].complete = true
-    elseif log1 == "unitBuild" then
-      if log[4] == 1 then
-        unitFunc:spawnInfantry(log[2], log[3])
+    if phase == 'movement' then
+      if log1 == "unitMove" then
+        unitFunc:turnTickMove(log[3], log[5], log[6], log[7])
         turnLog[i].complete = true
-      else
-        turnLog[i][4] = turnLog[i][4]-1
+      elseif log1 == "unitBuild" then
+        if log[4] == 1 then
+          unitFunc:spawnInfantry(log[2], log[3])
+          turnLog[i].complete = true
+          for i = 1,#cities do
+            if log1.city == cities[i].number then
+              cities[i].building = false
+            end
+          end
+        else
+          turnLog[i][4] = turnLog[i][4]-1
+        end
       end
+    elseif phase == 'fight' then
+
     end
   end
   doot = true

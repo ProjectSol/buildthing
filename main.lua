@@ -13,6 +13,7 @@ require "Empire/unitFunc"
 require "Systems/turnTimer"
 jupiter = require "SaveTableToFile/Jupiter-master/jupiter"
 luaTable = require("SaveTableToFile/LuaTable")
+--require 'myButton'
 lg = love.graphics
 
 --require "Serial-master/serial"
@@ -35,6 +36,7 @@ end]]
 
 function mapDeclarations()
 	love.math.setRandomSeed( os.time() )
+	tenthMeasure = love.graphics:getHeight()/10
 	currMap = 'europe'
 	mapC = {}
 	player = {}
@@ -53,6 +55,7 @@ function mapDeclarations()
 	yShift = 0
 	autoTurn = true
 	cities = {}
+	UI:menuButn()
 	--[[teamColours1 = {
 	{46,208,176}, {41,128,185},
 	{26, 194, 93},{142,68,173},
@@ -252,11 +255,11 @@ end
 line1 = 'dude game sux'
 line2 = 'See above and come to your own conclusion'
 
+
+
 textDraw:delayedNewText(line1, 1)
 textDraw:delayedNewText(line2, 2)
 
-
---dbugPrint = nil
 dbugPrint = nil
 function debugPrint()
 	if dbugPrint then
@@ -267,7 +270,7 @@ function debugPrint()
 			lg.setFont(status)
 		end
 		local a = status:getWidth( dbugPrint )
-		lg.print(dbugPrint, 45*lg:getWidth()/100-a, 45*lg:getHeight()/100-a)
+		lg.print(dbugPrint, 45*lg:getWidth()/100-(4*a/5), 45*lg:getHeight()/100)
 	else
 		lg.setFont(debugFont)
 		lg.setColor(0,0,0)
@@ -275,12 +278,11 @@ function debugPrint()
 	end
 end
 
-
 function displayTurnLog()
 	for i = 1,#turnLog do
 		lg.setFont(status)
 		lg.setColor(50, 50, 50)
-		lg.print(turnLog[i][1], lg:getWidth()*0.9, lg:getHeight()-(20*i)-20)
+		lg.print(turnLog[i][1]..' Turns remaning: '..turnLog[i][4], lg:getWidth()*0.8, lg:getHeight()-(20*i)-45)
 	end
 end
 
@@ -324,8 +326,12 @@ function love.draw()
 		if green then
 		lg.print(love.filesystem.getSaveDirectory() or 'god damnit')
 		end
-		lg.setColor(10,10,10,255)
+		lg.setColor(200,200,200,255)
 		lg.print("Alpha 0.0.5", lg:getWidth()-95, (98*lg:getHeight())/100)
 	end
+	--dbugPrint = #units
+	--[[buttonFunc:draw()
+	buttonFunc:drawText()
+	buttonFunc:Colour()]]
 	debugPrint()
 end
