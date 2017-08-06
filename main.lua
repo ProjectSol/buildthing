@@ -56,6 +56,7 @@ function mapDeclarations()
 	autoTurn = true
 	cities = {}
 	UI:menuButn()
+	currControl = 0
 	--[[teamColours1 = {
 	{46,208,176}, {41,128,185},
 	{26, 194, 93},{142,68,173},
@@ -205,6 +206,7 @@ function love.mousepressed(x, y, button, istouch)
 		localX, localY = love.mouse.getPosition()
 		--createMap:recordMap()
 		notUnselected = true
+		cityMenuDoClick()
 		if UI:checkDoubleClickMap() then
 			UI:displayCityPage()
 			UI:displayUnitPage()
@@ -255,7 +257,46 @@ end
 line1 = 'dude game sux'
 line2 = 'See above and come to your own conclusion'
 
+function cityMenuDoClick()
+	for i = 1,#buttons do
+		local menuButtons = buttons[i]
+		if checkCollision(menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h, localX, localY, 1, 1) then
+			UI:checkDoubleClickMapFalse()
+			if menuButtons.id == 0 then
+				dbugPrint='This button does not have a unique id'
+			elseif menuButtons.id == 1 then
+				if currBuildCity and cityPanel3Display and currBuildCity.building ~= true then
+					local c = love.math.random(-1,1)
+					local m = love.math.random(-1,1)
+					local g = (gridSize*m)+c
+					local f = currBuildCity.loc
+					turnTimer:addUnitBuildOrder(currBuildCity.team, f, 2, currBuildCity.number)
+					currBuildCity.building = true
+				end
+			end
+		end
+	end
+end
 
+function drawCityMenuButtons()
+	if cityPanel3Display then
+		for i = 1,#buttons do
+			local menuButtons = buttons[i]
+			if checkCollision(menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h, localX, localY, 1, 1) then
+				useCol = {menuButtons.colour[4],menuButtons.colour[5],menuButtons.colour[6]}
+				namCol = {menuButtons.nameColour[4],menuButtons.nameColour[5],menuButtons.nameColour[6]}
+			else
+				useCol = {menuButtons.colour[1],menuButtons.colour[2],menuButtons.colour[3]}
+				namCol = {menuButtons.nameColour[1],menuButtons.nameColour[2],menuButtons.nameColour[3]}
+			end
+			love.graphics.setColor(useCol)
+			love.graphics.rectangle(menuButtons.mode, menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h)
+			love.graphics.setFont(mainFont)
+			love.graphics.setColor(namCol)
+			lg.print(menuButtons.name, menuButtons.x+3, menuButtons.y+menuButtons.h/8)
+		end
+	end
+end
 
 textDraw:delayedNewText(line1, 1)
 textDraw:delayedNewText(line2, 2)
@@ -270,11 +311,9 @@ function debugPrint()
 			lg.setFont(status)
 		end
 		local a = status:getWidth( dbugPrint )
-		lg.print(dbugPrint, 45*lg:getWidth()/100-(4*a/5), 45*lg:getHeight()/100)
+		lg.print(dbugPrint, 10, 45*lg:getHeight()/100)
 	else
-		lg.setFont(debugFont)
-		lg.setColor(0,0,0)
-		lg.print("", 45*lg:getWidth()/100, 45*lg:getHeight()/100)
+		--doing nothing
 	end
 end
 
@@ -310,6 +349,7 @@ function love.draw()
 		lg.setColor(150, 0, 0)
 		fps = tostring(love.timer.getFPS())
 		lg.print("Current FPS: "..fps, lg:getWidth()-150, 16)
+
 		--[[if active == true then
 			gamma = 'no tile selected'
 			for i = 1,#units do
@@ -323,6 +363,7 @@ function love.draw()
 		--lg.setColor(200, 50, 50)
 		--dotheotherthing()
 		gui.draw()
+		drawCityMenuButtons()
 		if green then
 		lg.print(love.filesystem.getSaveDirectory() or 'god damnit')
 		end

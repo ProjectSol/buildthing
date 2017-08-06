@@ -13,6 +13,22 @@ function turnTimer:switchTurnMode()
   end
 end
 
+function turnTimer:switchPlayerOrDev()
+  if currBuildCity then
+    if currControl == 0 then
+      currControl = currBuildCity.team
+      dbugPrint = 'TEAM: '..tostring(currControl)
+    else
+      currControl = 0
+      dbugPrint = 'Using the Developer Interface'
+    end
+  elseif currControl > 0 then
+
+  else
+    dbugPrint = 'Double click a city to join that team'
+  end
+end
+
 function turnTimer:addUnitMoveOrder(team, loc1, loc2, movRange, unit)
   --entry four is the turns remaining so that the formatting for unit building doesn't look all janky
   local unitMove = {"unitMove", team, loc1, 1, loc2, movRange, unit, complete = false}

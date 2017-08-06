@@ -493,23 +493,7 @@ function UI:symbols()
     end
   end
 
-  for i = 1,#buttons do
-    local menuButtons = buttons[i] 
-    if checkCollision(menuButtons.x, menuButtons.y, saveButtonW, saveButtonH, localX, localY, 1, 1) then
-      menuButtons.r = 150
-      menuButtons.g = 150
-      menuButtons.b = 255
-      menuButtons.a = 200
-    else
-      menuButtons.r = 150
-      menuButtons.g = 150
-      menuButtons.b = 255
-      menuButtons.a = 255
-    end
-    love.graphics.setColor(menuButtons.r, menuButtons.g, menuButtons.b, menuButtons.a)
-    love.graphics.rectangle(menuButtons.mode, menuButtons.x, menuButtons.y, saveButtonW, saveButtonH)
-    textDraw:delayDraw(3, 0.095, menuButtons.x+(saveButtonH/4), menuButtons.y+(saveButtonH/4), mainFont)
-  end
+
 
   --i, n, m, bx, by, bw, bh, br, bg, bb, ba, tf, TF, rT, gT, bT
   --buttonFunc:Setup(1, 'kill me', "line", 20, tenthMeasure, 150, 30, 155, 255, 0, 255, true, true, 255, 255, 255)
@@ -619,6 +603,22 @@ function UI:symbols()
     turnTimer:switchTurnMode()
   end
 
+  local devMode = gui.create( "button" )
+  devMode:setPos(210, lg:getHeight()-30 )
+  devMode:setSize( 95, 30 )
+  --love.graphics.setLineWidth(2)
+  function devMode:paint(w, h)
+    devMode:setTextColor(255, 255, 255)
+    love.graphics.setColor(200, 0, 0, 255)
+    love.graphics.rectangle( "fill", 0, 0, w, h )
+    devMode:setTextOffset(0,0)
+    devMode:setFont(status)
+    devMode:setText("Dev/Player")
+  end
+  function devMode:doClick()
+    turnTimer:switchPlayerOrDev()
+  end
+
 end
 
 function UI:drawStatusBar()
@@ -707,13 +707,14 @@ function UI:displayCityPage()
         if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
           cityPanel1Display = true
           cityPanel2Display = true
-          cityPanel3Display = true
           for k = 1,#cities do
-            if cities[k].loc == i then
-              cityName = cities[k].name
-              currBuildCity = cities[k]
-              --dbugPrint = k
-              break
+            if cities[k].loc == i  then
+              if currControl == cities[k].team or currControl == 0 then
+                cityName = cities[k].name
+                currBuildCity = cities[k]
+                --dbugPrint = k
+                break
+              end
             end
           end
         break
@@ -723,6 +724,7 @@ function UI:displayCityPage()
         cityPanel1Display = false
         cityPanel2Display = false
         cityPanel3Display = false
+        currBuildCity = nil
       end
     end
   end
@@ -767,12 +769,15 @@ end
 
 function UI:menuButn()
   buttons = {}
-  local base = {x=100,y=100,h=30,w=150,colour={125,125,125},name='UNNAMEDBUTTON'}
+  local base = {mode='fill',x=100,y=100,h=30,w=150,colour={125,125,125,100,100,100},nameColour={75,75,75,50,50,50},name='UNNAMEDBUTTON', id=0}
+  -- for id building infantry is 1, 0 just makes dbugPrint popup an error and the remaining will be defined at a later date
+
   local buildInfantGlobal = base
   buildInfantGlobal.name = 'Build Infantry'
   buildInfantGlobal.x = 30
   buildInfantGlobal.y = tenthMeasure
-
+  buildInfantGlobal.id = 1
+  table.insert(buttons, buildInfantGlobal)
 end
 
 return UI
