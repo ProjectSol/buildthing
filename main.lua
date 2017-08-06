@@ -279,9 +279,24 @@ function cityMenuDoClick()
 end
 
 function drawCityMenuButtons()
-	if cityPanel3Display then
-		for i = 1,#buttons do
-			local menuButtons = buttons[i]
+	for i = 1,#buttons do
+		local menuButtons = buttons[i]
+		if buttons.id == 1 then
+			if cityPanel3Display then
+				if checkCollision(menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h, localX, localY, 1, 1) then
+					useCol = {menuButtons.colour[4],menuButtons.colour[5],menuButtons.colour[6]}
+					namCol = {menuButtons.nameColour[4],menuButtons.nameColour[5],menuButtons.nameColour[6]}
+				else
+					useCol = {menuButtons.colour[1],menuButtons.colour[2],menuButtons.colour[3]}
+					namCol = {menuButtons.nameColour[1],menuButtons.nameColour[2],menuButtons.nameColour[3]}
+				end
+				love.graphics.setColor(useCol)
+				love.graphics.rectangle(menuButtons.mode, menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h)
+				love.graphics.setFont(mainFont)
+				love.graphics.setColor(namCol)
+				lg.print(menuButtons.name, menuButtons.x+3, menuButtons.y+menuButtons.h/8)
+			end
+		elseif button.id == 2 then
 			if checkCollision(menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h, localX, localY, 1, 1) then
 				useCol = {menuButtons.colour[4],menuButtons.colour[5],menuButtons.colour[6]}
 				namCol = {menuButtons.nameColour[4],menuButtons.nameColour[5],menuButtons.nameColour[6]}
@@ -297,6 +312,7 @@ function drawCityMenuButtons()
 		end
 	end
 end
+
 
 textDraw:delayedNewText(line1, 1)
 textDraw:delayedNewText(line2, 2)

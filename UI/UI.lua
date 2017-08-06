@@ -778,6 +778,15 @@ function UI:menuButn()
   buildInfantGlobal.y = tenthMeasure
   buildInfantGlobal.id = 1
   table.insert(buttons, buildInfantGlobal)
+
+  local controlMode = base
+  controlMode.name = 'Dev/Player mode'
+  controlMode.x = 210
+  controlMode.y = love.graphics:getHeight()-30
+  controlMode.w = 95
+  controlMode.h = 30
+  controlMode.id = 2
+  table.insert(buttons, controlMode)
 end
 
 return UI
