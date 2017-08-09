@@ -603,7 +603,7 @@ function UI:symbols()
     turnTimer:switchTurnMode()
   end
 
-  local devMode = gui.create( "button" )
+--[[  local devMode = gui.create( "button" )
   devMode:setPos(210, lg:getHeight()-30 )
   devMode:setSize( 95, 30 )
   --love.graphics.setLineWidth(2)
@@ -617,7 +617,7 @@ function UI:symbols()
   end
   function devMode:doClick()
     turnTimer:switchPlayerOrDev()
-  end
+  end]]
 
 end
 
@@ -658,6 +658,7 @@ function UI:displayUnitPage()
       localX, localY = love.mouse.getPosition()
       if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
         unitPanelDisplay = true
+        unitPanel2Display = true
         unitName = units[i].name
         notUnselected = false
         for k = 1,#units do
@@ -666,6 +667,7 @@ function UI:displayUnitPage()
         break
       else
         unitPanelDisplay = false
+        unitPanel2Display = false
       end
     end
   end
@@ -708,13 +710,21 @@ function UI:displayCityPage()
           cityPanel1Display = true
           cityPanel2Display = true
           for k = 1,#cities do
-            if cities[k].loc == i  then
-              if currControl == cities[k].team or currControl == 0 then
+            if cities[k].loc == loc  then
+              --if currControl == 0 or currControl == cities[k].team then
                 cityName = cities[k].name
                 currBuildCity = cities[k]
+                cityPanel3Display = true
                 --dbugPrint = k
                 break
-              end
+              --end
+            end
+            for k = 1,#cities do
+              --if cities[k].loc == loc  then
+                if currControl == 0 or currControl == cities[k].team then
+                  cityPanel3Display = true
+                end
+              --end
             end
           end
         break
@@ -769,23 +779,28 @@ end
 
 function UI:menuButn()
   buttons = {}
-  local base = {mode='fill',x=100,y=100,h=30,w=150,colour={125,125,125,100,100,100},nameColour={75,75,75,50,50,50},name='UNNAMEDBUTTON', id=0}
+  local tenthMeasure = love.graphics:getHeight()/10
+  local base = {mode='fill',x=100,y=100,h=30,w=150,colour={125,125,125,100,100,100},nameColour={75,75,75,50,50,50},name='UNNAMEDBUTTON', draw=false}
   -- for id building infantry is 1, 0 just makes dbugPrint popup an error and the remaining will be defined at a later date
 
-  local buildInfantGlobal = base
+  buildInfantGlobal = {mode='fill',x=100,y=100,h=30,w=150,colour={125,125,125,100,100,100},nameColour={75,75,75,50,50,50},name='UNNAMEDBUTTON', draw = false}
   buildInfantGlobal.name = 'Build Infantry'
   buildInfantGlobal.x = 30
   buildInfantGlobal.y = tenthMeasure
+  buildInfantGlobal.colour = {125,125,125,100,100,100}
+  buildInfantGlobal.nameColour = {75,75,75,50,50,50}
   buildInfantGlobal.id = 1
   table.insert(buttons, buildInfantGlobal)
 
-  local controlMode = base
+  controlMode = {mode='fill',x=100,y=100,h=30,w=150,colour={125,125,125,100,100,100},nameColour={75,75,75,50,50,50},name='UNNAMEDBUTTON', draw = false}
   controlMode.name = 'Dev/Player mode'
   controlMode.x = 210
   controlMode.y = love.graphics:getHeight()-30
   controlMode.w = 95
   controlMode.h = 30
-  controlMode.id = 2
+  controlMode.draw = true
+  controlMode.colour = {200,0,0,200,90,90}
+  controlMode.nameColour = {255,255,255,255,255,255}
   table.insert(buttons, controlMode)
 end
 

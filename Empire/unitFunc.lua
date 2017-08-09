@@ -10,7 +10,7 @@ function unitFunc:gameStart()
       if map[loc2] then
         if map[loc2].type ~= 'water' then
           unitFunc:spawnInfantry(loc2, cities[i].team)
-          a = false 
+          a = false
         end
       end
     end
@@ -18,41 +18,68 @@ function unitFunc:gameStart()
 end
 
 function unitFunc:spawnInfantry(loc, team)
-  local infant = {name = 'infantry', team = team, selected = 0, location = loc, colour = teamColours1[team], movRange = 2}
+  local infant = {name = 'infantry', team = team, selected = 0, location = loc, colour = teamColours1[team], movRange = 2, strength = 4, attacking = false, id = #units+1}
   table.insert(units, infant)
 end
 
-function unitFunc:drawMovRadius()
+function unitFunc:drawAttackRadius()
+  if phase == 'fight' then
   for i = 1,#units do
     if units[i].selected == 1 then
       tCol = units[i].colour
-      unitFunc:moveLandlocked(units[i].location, units[i].movRange)
-    	--love.graphics.print(#moveOutput or 'nope.avi', 20, 20)
-    	for k = 1,#moveOutput do
-    		love.graphics.setColor(tCol)
-    		createMap:genTilePos(moveOutput[k][1])
-        local alignment = moveOutput[k][1]
-        local dbug = moveOutput[k][4]
-    		local x = drawX
-    		local y = drawY
+      unit1 = units[i]
+      unitFunc:unitAttackRange(unit1.location, unit1.movRange+1)
+      --love.graphics.print(#moveOutput or 'nope.avi', 20, 20)
+      for k = 1,#attackOutput do
+        love.graphics.setColor(tCol)
+        createMap:genTilePos(attackOutput[k][1])
+        local alignment = attackOutput[k][1]
+        local dbug = attackOutput[k][4]
+        local x = drawX
+        local y = drawY
                           ---tr corner              tr corner               bottom
-    		local vertices = {x+squareSize-3, y+3, x+squareSize/2+3, y+3, x+squareSize-3, y+squareSize/2-3}
+        local vertices = {x+squareSize-3, y+3, x+squareSize/2+3, y+3, x+squareSize-3, y+squareSize/2-3}
         love.graphics.setLineWidth(2)
         love.graphics.polygon('line', vertices)
-        love.graphics.setColor(255,255,255)
-        love.graphics.setFont(font)
-        --love.graphics.print(tostring(alignment), x+3, y+3)
-        --if k < 5 then
-          --love.graphics.print(k, x, y+15)
-        --end
-        --love.graphics.setColor(255, 0, 0)
-        --love.graphics.print(#moveOutput, x-400, x+15)
       end
-        --[[for l = 1,#TESTTILES do
-          love.graphics.setFont(status)
-          love.graphics.print(#TESTTILES, 400, 400)
-        end]]
+    end
+  end
+  end
+end
 
+function unitFunc:drawMovRadius()
+  if phase == 'movement' then
+    for i = 1,#units do
+      if units[i].selected == 1 then
+        tCol = units[i].colour
+        unitFunc:moveLandlocked(units[i].location, units[i].movRange)
+      	--love.graphics.print(#moveOutput or 'nope.avi', 20, 20)
+      	for k = 1,#moveOutput do
+      		love.graphics.setColor(tCol)
+      		createMap:genTilePos(moveOutput[k][1])
+          local alignment = moveOutput[k][1]
+          local dbug = moveOutput[k][4]
+      		local x = drawX
+      		local y = drawY
+                            ---tr corner              tr corner               bottom
+      		local vertices = {x+squareSize-3, y+3, x+squareSize/2+3, y+3, x+squareSize-3, y+squareSize/2-3}
+          love.graphics.setLineWidth(2)
+          love.graphics.polygon('line', vertices)
+          love.graphics.setColor(255,255,255)
+          love.graphics.setFont(font)
+          --love.graphics.print(tostring(alignment), x+3, y+3)
+          --if k < 5 then
+            --love.graphics.print(k, x, y+15)
+          --end
+          --love.graphics.setColor(255, 0, 0)
+          --love.graphics.print(#moveOutput, x-400, x+15)
+        end
+          --[[for l = 1,#TESTTILES do
+            love.graphics.setFont(status)
+            love.graphics.print(#TESTTILES, 400, 400)
+          end]]
+
+      end
     end
   end
 end
@@ -78,7 +105,7 @@ end]]
 
 function unitFunc:select()
   for i = 1,#units do
-    if units[i] then
+    if units[i].team == currControl or currControl == 0 then
       local loc = units[i].location
       createMap:genTilePos(loc)
       worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
@@ -367,95 +394,148 @@ function unitFunc:moveLandlocked(tile1, range)
   end
 end
 
-function unitFunc:try1(tile1, range)
-	local mvprOutput = {}
-	local b = tile1
-  local defaultCol = b%gridSize
-  local defaultRow = math.ceil(b/gridSize)
-	for q = -range,range do
-    local tileSel1 = b+q
-    if tileSel1 < b then
-      local alignment1 = 'west'
-    else
-      local alignment1 = 'east'
-    end
-    local tileSel2 = b+(q*gridSize)
-    if tileSel1 < b then
-      local alignment2 = 'north'
-    else
-      local alignment2 = 'south'
-    end
-    local tileCol1 = tileSel1%gridSize
-    local tileRow1 = math.ceil(tileSel1/gridSize)
-    local tileCol2 = tileSel2%gridSize
-    local tileRow2 = math.ceil(tileSel2/gridSize)
-    --Returns tiles around the initial tile, does not search entire grid
-    if tileSel1 > 0 and tileSel1 < gridSize^2 then
-      local tile = {tileSel1, tileCol1, tileRow1, nil, alignment1}
-      table.insert(mvprOutput, tile)
-    end
-    if tileSel2 > 0 and tileSel2 < gridSize^2 then
-      local tile = {tileSel2, tileCol2, tileRow2, nil, alignment2}
-      table.insert(mvprOutput, tile)
-    end
-  end
-  --removes tiles on water
-  local remove = {}
-  for i = 1,#mvprOutput do
-    local x = mvprOutput[i][1]
-    if map[x].type == water then
-      table.insert(remove, mvprOutput[i])
-    end
-  end
-  for i = 1,#mvprOutput do
-    if mvprOutput[i] == remove[q] then
-      table.remove(mvprOutput, i)
-    end
-  end
-  --end of initial pass, the cross is built here with the water tiles deleted but without the extraneous tiles removed
-  --[[remove = {}
-  for i = 1,#mvprOutput do
-    for k = 1,#mvprOutput do
-      if mvprOutput[i][5] == 'north' then
+function unitFunc:unitAttackRange(tile1, range)
+  	atkprOutput = {}
+    atkOutput = {}
+  	local b = tile1
+  	for q = -(range-1),(range-1) do
+      local tileSel = b+q
+      local tileCol = tileSel%gridSize
+      local tileRow = math.ceil(tileSel/gridSize)
+      if tileCol == 0 then
+        tileCol = gridSize
+      end
+      bColumn = b%gridSize
+      if bColumn == 0 then
+        bColumn = gridSize
+      end
+      --TESTTILES = {}
+      if tileSel > 0 and tileSel <= gridSize^2 and tileCol == bColumn+q then
+        local tile = {tileSel, tileCol, tileRow, 4}
+        table.insert(atkprOutput, tile)
+        --table.insert(TESTTILES, tileSel)
+        --createMap:genTilePos(tileSel)
+        --love.graphics.print(tostring(q), drawX+(squareSize/2), drawY+(squareSize/2))
+      end
 
+      for i = 1,#atkprOutput do
+        local x = atkprOutput[i]
+        if x[3] == math.ceil(b/gridSize) then
+          local rnge = math.abs(b-x[1])
+          local height = (range-1)-rnge
+          if height == 0 then
+            local tileSel = x[1]
+            local tileCol = tileSel%gridSize
+            local tileRow = math.ceil(tileSel/gridSize)
+            if tileSel > 0 and tileSel <= gridSize^2 --[[and tileCol == bColumn+q]] then
+              local tile = {tileSel, tileCol, tileRow}
+              table.insert(atkOutput, tile)
+            end
+          else
+            for k = 0,height do
+              local f = -k
+              local avoid = {}
+              local run = true
+              local tileSel = x[1]+(f*gridSize)
+              local tileCol = tileSel%gridSize
+              local tileRow = math.ceil(tileSel/gridSize)
+              if f ~= 0 and tileSel > 0 and tileSel <= gridSize^2 then
+                if map[tileSel].type == water then
+                  table.insert(avoid, f)
+                  break
+                end
+                for i = 0,#avoid do
+                  if f == avoid[i] then
+                    run = false
+                  end
+                end
+              end
+              if tileSel > 0 and tileSel <= gridSize^2 --[[and tileCol == bColumn+q]] and run == true then
+                local tile = {tileSel, tileCol, tileRow}
+                if tileSel ~= b then
+                  table.insert(atkOutput, tile)
+                  createMap:genTilePos(tileSel)
+                  --love.graphics.print(tostring(f), drawX+(squareSize/2), drawY+(squareSize/2))
+                  --love.graphics.print(tostring(k), drawX+(squareSize/2), drawY+(squareSize/2))
+                else
+                  run = true
+                end
+              end
+            end
+            for k = 1,height do
+              local run = true
+              local avoid = {}
+              local tileSel = x[1]+(k*gridSize)
+              local tileCol = tileSel%gridSize
+              local tileRow = math.ceil(tileSel/gridSize)
+              if tileSel > 0 and tileSel < gridSize^2 then
+                if map[tileSel].type == water then
+                  table.insert(avoid, k)
+                  break
+                end
+              end
+              for i = 0,#avoid do
+                if k == avoid[i] then
+                  run = false
+                end
+              end
+              if tileSel > 0 and tileSel <= gridSize^2 --[[and tileCol == bColumn+q]] and run == true then
+                local tile = {tileSel, tileCol, tileRow}
+                table.insert(atkOutput, tile)
+                createMap:genTilePos(tileSel)
+                love.graphics.setColor(150,0,150)
+                --love.graphics.print(tostring(k), drawX+(squareSize/2), drawY+(squareSize/2))
+              else
+                run = true
+              end
+            end
+          end
+        end
       end
-    end
-  end
-  for i = 1,#mvprOutput do
-    if mvprOutput[i][4] == true then
-      table.remove(mvprOutput, i)
-    end
-  end]]
-  --[[remove = {}
-  local c1, c2, c3, c4 = false
-  for i = 1,#mvprOutput do
-    local x = mvprOutput[i]
-    if x[2] == defaultCol then
-      if x[3] == defaultRow+1 then
-        c1 = true
-      elseif x[3] == defaultRow-1 then
-        c2 = true
-      elseif x[3] == defaultRow+2 then
-        c3 = true
-      elseif x[3] == defaultRow-2 then
-        c4 = true
-      end
-    end
-    if c1 == false then
-      for k = 1,#mvprOutput do
-        local y = mvprOutput[k]
-        if y[3] > defaultCol then
+
+      --removing water tiles
+      local remove = {}
+      for i = 1,#atkOutput do
+        local y = atkOutput[i]
+        local x = y[1]
+        if map[x].type == water then
           table.insert(remove, y)
         end
       end
-    end
-  end]]
 
-  moveOutput = {}
-  for i = 1,#mvprOutput do
-    table.insert(moveOutput, mvprOutput[i])
+      for k = 1,#remove do
+        for i = 1,#atkOutput do
+          local x = atkOutput[i][1]
+          local q = remove[k][1]
+          if x == q then
+            table.remove(atkOutput, i)
+            break
+          end
+        end
+      end
+      --water tiles are removed
+
+      local atkiOutput = {}
+      for i = 1,#atkOutput do
+        local x = atkOutput[i][1]
+        local inp = true
+        for k = 1,#atkiOutput do
+          if atkiOutput[k][1] == x then
+            inp = false
+          end
+        end
+        if inp == true then
+          table.insert(atkiOutput, atkOutput[i])
+        end
+      end
+
+      attackOutput = {}
+      for i = 1,#atkiOutput do
+        table.insert(attackOutput, atkiOutput[i])
+      end
+    end
   end
-end
+
 
 function unitFunc:checkGrid(tile1, range)
 	rngOutput = {}

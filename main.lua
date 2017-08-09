@@ -212,16 +212,32 @@ function love.mousepressed(x, y, button, istouch)
 			UI:displayUnitPage()
 		end
 		mapFunc:mapColour()
-		for k = 1,#map do
-			createMap:genTilePos(k)
-			if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-				unitFunc:move(k)
-				if notUnselected then
-					unitFunc:select()
+		if phase == 'movement' then
+			for k = 1,#map do
+				createMap:genTilePos(k)
+				if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
+					unitFunc:move(k)
+					if notUnselected then
+						unitFunc:select()
+					end
+				end
+			end
+		elseif phase == 'fight' then
+			for k = 1,#units do
+				createMap:genTilePos(units[k].location)
+				if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
+					for i = 1,#units do
+			      if units[i].selected == 1 then
+			        local unit = i
+			        turnTimer:addUnitMoveOrder(units[i], units[k])
+			      end
+			    end
+					if notUnselected == false then
+						unitFunc:select()
+					end
 				end
 			end
 		end
-
 		gui.buttonCheck( x, y, button )
 	end
 end
@@ -265,14 +281,10 @@ function cityMenuDoClick()
 			if menuButtons.id == 0 then
 				dbugPrint='This button does not have a unique id'
 			elseif menuButtons.id == 1 then
-				if currBuildCity and cityPanel3Display and currBuildCity.building ~= true then
-					local c = love.math.random(-1,1)
-					local m = love.math.random(-1,1)
-					local g = (gridSize*m)+c
-					local f = currBuildCity.loc
-					turnTimer:addUnitBuildOrder(currBuildCity.team, f, 2, currBuildCity.number)
-					currBuildCity.building = true
-				end
+				turnTimer:runInfantBuild()
+			elseif menuButtons.id == 2 then
+				print('fucking gemmerasdas')
+				turnTimer:switchPlayerOrDev()
 			end
 		end
 	end
@@ -281,22 +293,16 @@ end
 function drawCityMenuButtons()
 	for i = 1,#buttons do
 		local menuButtons = buttons[i]
-		if buttons.id == 1 then
-			if cityPanel3Display then
-				if checkCollision(menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h, localX, localY, 1, 1) then
-					useCol = {menuButtons.colour[4],menuButtons.colour[5],menuButtons.colour[6]}
-					namCol = {menuButtons.nameColour[4],menuButtons.nameColour[5],menuButtons.nameColour[6]}
-				else
-					useCol = {menuButtons.colour[1],menuButtons.colour[2],menuButtons.colour[3]}
-					namCol = {menuButtons.nameColour[1],menuButtons.nameColour[2],menuButtons.nameColour[3]}
-				end
-				love.graphics.setColor(useCol)
-				love.graphics.rectangle(menuButtons.mode, menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h)
-				love.graphics.setFont(mainFont)
-				love.graphics.setColor(namCol)
-				lg.print(menuButtons.name, menuButtons.x+3, menuButtons.y+menuButtons.h/8)
-			end
-		elseif button.id == 2 then
+		lg.print(tostring(menuButtons.draw),i,i*30)
+		if menuButtons.id == 1 and cityPanel3Display then
+			buttons[i].draw = true
+		elseif menuButtons.id == 1 then
+			buttons[i].draw = false
+		end
+	end
+	for i = 1,#buttons do
+		local menuButtons = buttons[i]
+		if menuButtons.draw == true then
 			if checkCollision(menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h, localX, localY, 1, 1) then
 				useCol = {menuButtons.colour[4],menuButtons.colour[5],menuButtons.colour[6]}
 				namCol = {menuButtons.nameColour[4],menuButtons.nameColour[5],menuButtons.nameColour[6]}
@@ -306,9 +312,9 @@ function drawCityMenuButtons()
 			end
 			love.graphics.setColor(useCol)
 			love.graphics.rectangle(menuButtons.mode, menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h)
-			love.graphics.setFont(mainFont)
+			love.graphics.setFont(status)
 			love.graphics.setColor(namCol)
-			lg.print(menuButtons.name, menuButtons.x+3, menuButtons.y+menuButtons.h/8)
+			lg.print(menuButtons.name, menuButtons.x+3, menuButtons.y+menuButtons.h/4+1)
 		end
 	end
 end
@@ -346,49 +352,22 @@ function love.draw()
 		Camera:attach()
 		mapFunc:drawMap()
 		unitFunc:drawMovRadius()
+		unitFunc:drawAttackRadius()
 		UI:drawUnits()
-		--Some old debugging stuff
-			--[[lg.print(adjTileOutput[2], 990, 0)
-			lg.setColor(50,50,80)
-			lg.print(adjTileOutput[3]..' this is num 3', 0, 100)
-			lg.print(adjTileOutput[4], 990, 100)]]
-
 		Camera:detach()
 		displayTurnLog()
 		--mapFunc:drawMapEditor()
-		--textDraw:delayDraw(1, 0.05, 475, 30, mainFont)
-	  --textDraw:delayDraw(2, 0.05, 475, 50, mainFont)
-		--lg.print(counter, 0,10)
 		UI:drawUI()
 		lg.setBackgroundColor(200, 200, 200, 255)
 		lg.setFont(font)
 		lg.setColor(150, 0, 0)
 		fps = tostring(love.timer.getFPS())
 		lg.print("Current FPS: "..fps, lg:getWidth()-150, 16)
-
-		--[[if active == true then
-			gamma = 'no tile selected'
-			for i = 1,#units do
-				if units[i].selected == 1 then
-					lg.setFont(debugFont)
-					gamma = tostring(units[i].location)
-				end
-			end
-		end]]
-		--lg.print(gamma or '',0,100)
-		--lg.setColor(200, 50, 50)
-		--dotheotherthing()
 		gui.draw()
 		drawCityMenuButtons()
-		if green then
-		lg.print(love.filesystem.getSaveDirectory() or 'god damnit')
-		end
 		lg.setColor(200,200,200,255)
-		lg.print("Alpha 0.0.5", lg:getWidth()-95, (98*lg:getHeight())/100)
+		lg.print("Alpha 0.1.0", lg:getWidth()-95, (98*lg:getHeight())/100)
 	end
-	--dbugPrint = #units
-	--[[buttonFunc:draw()
-	buttonFunc:drawText()
-	buttonFunc:Colour()]]
+	  dbugPrint = currControl
 	debugPrint()
 end
