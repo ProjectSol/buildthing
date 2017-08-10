@@ -25,19 +25,19 @@ function turnTimer:runInfantBuild()
 end
 
 function turnTimer:switchPlayerOrDev()
-  dbugPrint = currControl
+  --dbugPrint = currControl
   if currBuildCity then
     if currControl == 0 then
       currControl = currBuildCity.team
-      --dbugPrint = 'TEAM: '..tostring(currControl)
+    --  dbugPrint = 'TEAM: '..tostring(currControl)
     else
       currControl = 0
-      --dbugPrint = 'Using the Developer Interface'
+    --  dbugPrint = 'Using the Developer Interface'
     end
   elseif currControl >= 1 then
     currControl = 0
   else
-    dbugPrint = 'Double click a city to join that team'
+    --dbugPrint = 'Double click a city to join that team'
   end
 end
 
@@ -59,18 +59,18 @@ function turnTimer:addUnitBuildOrder(team, location, turnsRemaning, city)
 end
 
 function turnTimer:addUnitAttackOrder(unit1, unit2)
-  for k = 1,#units do
+  --[[for k = 1,#units do
     if units[k].selected == 1 then
       unit1 = units[k]
       unitFunc:unitAttackRange(unit1.location, unit1.movRange+1)
     end
     for i = 1,#attackOutput do
-      if unit2.loc == attackOutput[i] then
-        local attackOrder = {"attackOrder", unit1, unit2}
+      if unit2.loc == attackOutput[i] then]]
+        local attackOrder = {"attackOrder", unit1, unit2, 1, complete = false}
         table.insert(turnLog, attackOrder)
-      end
+      --[[end
     end
-  end
+  end]]
 end
 
 function turnTimer:exectueLog()
@@ -98,18 +98,31 @@ function turnTimer:exectueLog()
         if log[3].attacking then
           output1 = (unit2Strength/4)*0.8
           output2 = unit2Strength/4
+          if output1 < 1 then
+            output1 = 1
+          end
+          if output2 < 1 then
+            output2 = 1
+          end
         else
           output1 = (unit2Strength/4)
           output2 = unit2Strength/4
+          if output1 < 1 then
+            output1 = 1
+          end
+          if output2 < 1 then
+            output2 = 1
+          end
         end
         for i = 1,#units do
           if units[i].id == log[3].id then
             units[i].strength = units[i].strength-output1
           end
-          if units[i].id == log[3].id then
+          if units[i].id == log[2].id then
             units[i].strength = units[i].strength-output2
           end
         end
+        log.complete = true
       end
     end
   end
@@ -126,6 +139,25 @@ function turnTimer:exectueLog()
     phase = 'fight'
   elseif phase == 'fight' then
     phase = 'movement'
+  end
+  local remove = {}
+  for i = 1,#units do
+    local y = units[i]
+    local x = y[1]
+    if y.strength <= 0 then
+      table.insert(remove, y)
+    end
+  end
+
+  for k = 1,#remove do
+    for i = 1,#units do
+      local x = units[i].location
+      local q = remove[k].location
+      if x == q then
+        table.remove(units, i)
+        break
+      end
+    end
   end
 end
 

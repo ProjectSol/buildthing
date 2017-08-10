@@ -201,6 +201,7 @@ function love.update()
 end
 
 function love.mousepressed(x, y, button, istouch)
+	skip = false
 	if not bypass then
 		worldX, worldY = Camera:worldCoords(love.mouse.getPosition())
 		localX, localY = love.mouse.getPosition()
@@ -211,7 +212,6 @@ function love.mousepressed(x, y, button, istouch)
 			UI:displayCityPage()
 			UI:displayUnitPage()
 		end
-		mapFunc:mapColour()
 		if phase == 'movement' then
 			for k = 1,#map do
 				createMap:genTilePos(k)
@@ -222,23 +222,37 @@ function love.mousepressed(x, y, button, istouch)
 					end
 				end
 			end
-		elseif phase == 'fight' then
+		end
+		if phase == 'fight' then
+			print('Yes in fact you are in fight phase')
 			for k = 1,#units do
-				createMap:genTilePos(units[k].location)
-				if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-					for i = 1,#units do
-			      if units[i].selected == 1 then
-			        local unit = i
-			        turnTimer:addUnitMoveOrder(units[i], units[k])
-			      end
-			    end
-					if notUnselected == false then
-						unitFunc:select()
+				if units[k].selected == 1 then
+					--dbugPrint = 1
+			  	unit1 = units[k]
+			    unitFunc:unitAttackRange(unit1.location, unit1.movRange)
+					for i = 1,#attackOutput do
+						print(attackOutput[i][1])
+						print(units[k].location)
+						if units[k].location == attackOutput[i][1] then
+							createMap:genTilePos(units[k].location)
+							if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
+								skip = true
+								print('Good tile clickin fam')
+							  turnTimer:addUnitAttackOrder(units[k], units[k])
+							end
+						end
 					end
 				end
 			end
 		end
+		if skip == false then
+			unitFunc:select()
+		end
 		gui.buttonCheck( x, y, button )
+	end
+	mapFunc:mapColour()
+	if epsilon then
+		dbugPrint = epsilon
 	end
 end
 
@@ -274,16 +288,20 @@ line1 = 'dude game sux'
 line2 = 'See above and come to your own conclusion'
 
 function cityMenuDoClick()
+
 	for i = 1,#buttons do
 		local menuButtons = buttons[i]
 		if checkCollision(menuButtons.x, menuButtons.y, menuButtons.w, menuButtons.h, localX, localY, 1, 1) then
+
 			UI:checkDoubleClickMapFalse()
 			if menuButtons.id == 0 then
+				print('id is 0')
 				dbugPrint='This button does not have a unique id'
 			elseif menuButtons.id == 1 then
+				print('id is 1')
 				turnTimer:runInfantBuild()
 			elseif menuButtons.id == 2 then
-				print('fucking gemmerasdas')
+				print('adfsafd')
 				turnTimer:switchPlayerOrDev()
 			end
 		end
@@ -293,7 +311,7 @@ end
 function drawCityMenuButtons()
 	for i = 1,#buttons do
 		local menuButtons = buttons[i]
-		lg.print(tostring(menuButtons.draw),i,i*30)
+		--lg.print(tostring(menuButtons.draw),i,i*30)
 		if menuButtons.id == 1 and cityPanel3Display then
 			buttons[i].draw = true
 		elseif menuButtons.id == 1 then
@@ -366,8 +384,16 @@ function love.draw()
 		gui.draw()
 		drawCityMenuButtons()
 		lg.setColor(200,200,200,255)
-		lg.print("Alpha 0.1.0", lg:getWidth()-95, (98*lg:getHeight())/100)
+		lg.print("Alpha 0.5", lg:getWidth()-95, (98*lg:getHeight())/100)
 	end
-	  dbugPrint = currControl
 	debugPrint()
+	love.graphics.setColor(0,0,0)
+	if attackOutput then
+		for i = 1,#attackOutput do
+			love.graphics.print(tostring(attackOutput[i][1]),0,i*30)
+		end
+		for i = 1,#units do
+			love.graphics.print(tostring(units[i].location),50,i*30)
+		end
+	end
 end

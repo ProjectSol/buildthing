@@ -559,7 +559,7 @@ function UI:symbols()
       love.graphics.setLineWidth(10)
       love.graphics.rectangle('line', 0, 0, w, h, 10, 10, 20)
       unitPanel2:setTextColor( 50, 50, 50 )
-      unitPanel2:setText(unitName)
+      unitPanel2:setText(unitName.."\nCurrent Strength: "..unitStrength.."\nUnit ID: "..selectedUnit.id)
     else
       unitPanel2:setText('')
     end
@@ -580,7 +580,7 @@ function UI:symbols()
     love.graphics.rectangle( "fill", 0, 0, w, h )
     passTurn:setTextOffset(0,0)
     passTurn:setFont(status)
-    passTurn:setText("Pass Turn")
+    passTurn:setText("Next Phase")
   end
   function passTurn:doClick()
     --dbugPrint = 'passTurn received'
@@ -629,8 +629,31 @@ function UI:drawStatusBar()
   love.graphics.rectangle('fill', 0, lg:getHeight()-30, love.graphics.getWidth(), 30)
   love.graphics.setColor(200, 200, 200)
   love.graphics.setFont(status)
-  love.graphics.print(phase, lg:getWidth()/2-status:getWidth(phase),lg:getHeight()-20)
-
+  if currControl == 0 then
+    lg.setColor(200, 200, 200)
+    love.graphics.print(phase.."     Developer Interface", lg:getWidth()/2-status:getWidth(phase),lg:getHeight()-20)
+    lg.rectangle('fill', lg:getWidth()/2+status:getWidth("     Developer Interface")+30,lg:getHeight()-30, 30,30)
+  else
+    if teamColours1[currControl][1]+40 <= 255 then
+      phaseCol1 = teamColours1[currControl][1]+40
+    else
+      phaseCol1 = 255
+    end
+    if teamColours1[currControl][2]+40 <= 255 then
+      phaseCol2 = teamColours1[currControl][2]+40
+    else
+      phaseCol2 = 255
+    end
+    if teamColours1[currControl][3]+30 <= 255 then
+      phaseCol3 = teamColours1[currControl][3]+40
+    else
+      phaseCol3 = 255
+    end
+    lg.setColor(200,200,200)
+    love.graphics.print(phase.."     Team: "..currControl, lg:getWidth()/2-status:getWidth(phase),lg:getHeight()-20)
+    lg.setColor(phaseCol1, phaseCol2, phaseCol3)
+    lg.rectangle('fill', lg:getWidth()/2+status:getWidth("     Team: "..currControl)+30,lg:getHeight()-30, 30,30)
+  end
   --text
   love.graphics.setColor(255, 255, 255)
   love.graphics.draw(moneyDisplay, 30, 10)
@@ -660,6 +683,8 @@ function UI:displayUnitPage()
         unitPanelDisplay = true
         unitPanel2Display = true
         unitName = units[i].name
+        selectedUnit = units[i]
+        unitStrength = units[i].strength
         notUnselected = false
         for k = 1,#units do
           units[k].selected = 0
@@ -758,10 +783,13 @@ function UI:drawUnits()
 end
 
 function UI:unitTag(x, y, i)
-  local white = {255, 255, 255, 255}
+  local white = {200, 200, 200, 255}
   love.graphics.setColor(units[i].colour or white)
   local vertices = {x+squareSize-1, y+1, x+squareSize/2, y+1, x+squareSize-1, y+squareSize/2}
   love.graphics.polygon('fill', vertices)
+  lg.setColor(white)
+  lg.setFont(status)
+  lg.print(units[i].strength, x+(squareSize/2)-(status:getWidth(units[i].strength)/2), y+(squareSize/2)-(status:getHeight(units[i].strength)/2))
   --love.graphics.print(tostring(units[i].name),x+i/2,y)
 end
 
@@ -798,6 +826,7 @@ function UI:menuButn()
   controlMode.y = love.graphics:getHeight()-30
   controlMode.w = 95
   controlMode.h = 30
+  controlMode.id = 2
   controlMode.draw = true
   controlMode.colour = {200,0,0,200,90,90}
   controlMode.nameColour = {255,255,255,255,255,255}
