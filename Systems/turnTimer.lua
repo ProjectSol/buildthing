@@ -66,8 +66,9 @@ function turnTimer:addUnitAttackOrder(unit1, unit2)
     end
     for i = 1,#attackOutput do
       if unit2.loc == attackOutput[i] then]]
-        local attackOrder = {"attackOrder", unit1, unit2, 1, complete = false}
-        table.insert(turnLog, attackOrder)
+        --[[local attackOrder = {"attackOrder", unit1, unit2, 1, complete = false}
+        table.insert(turnLog, attackOrder)]]
+        --notUnselected = false
       --[[end
     end
   end]]
@@ -90,38 +91,47 @@ function turnTimer:exectueLog()
           turnLog[i][4] = turnLog[i][4]-1
         end
       end
-      phase = 'fight'
+      --phase = 'fight'
     elseif phase == 'fight' then
       if log1 == "attackOrder" then
-        local unit1Strength = log[2].strength
-        local unit2Strength = log[3].strength
-        if log[3].attacking then
-          output1 = (unit2Strength/4)*0.8
-          output2 = unit2Strength/4
-          if output1 < 1 then
-            output1 = 1
-          end
-          if output2 < 1 then
-            output2 = 1
-          end
-        else
-          output1 = (unit2Strength/4)
-          output2 = unit2Strength/4
-          if output1 < 1 then
-            output1 = 1
-          end
-          if output2 < 1 then
-            output2 = 1
+        unitFunc:unitAttackRange(log[2].location, log[2].movRange)
+        for i = 1,#attackOutput do
+          if log[3].location == attackOutput[i] then
+            dbugPrint = 'yes'
+            local unit1Strength = log[2].strength
+            local unit2Strength = log[3].strength
+            if log[3].attacking then
+              output1 = (unit2Strength/4)*0.8
+              output2 = unit2Strength/4
+              if output1 < 1 then
+                output1 = 1
+              end
+              if output2 < 1 then
+                output2 = 1
+              end
+            else
+              output1 = (unit2Strength/4)
+              output2 = unit2Strength/4
+              if output1 < 1 then
+                output1 = 1
+              end
+              if output2 < 1 then
+                output2 = 1
+              end
+            end
+            for i = 1,#units do
+              if units[i].id == log[3].id then
+                units[i].strength = units[i].strength-output1
+              end
+              if units[i].id == log[2].id then
+                units[i].strength = units[i].strength-output2
+              end
+            end
+            log.complete = true
           end
         end
-        for i = 1,#units do
-          if units[i].id == log[3].id then
-            units[i].strength = units[i].strength-output1
-          end
-          if units[i].id == log[2].id then
-            units[i].strength = units[i].strength-output2
-          end
-        end
+      else
+        dbugPrint = 'A unit was out of range'
         log.complete = true
       end
     end
@@ -135,8 +145,10 @@ function turnTimer:exectueLog()
       end
     end
   end
-  if phase == 'movement' then
+  if phase == 'movement' and autoTurn then
     phase = 'fight'
+  elseif phase == 'movement' and not autoTurn then
+    phase = 'movement'
   elseif phase == 'fight' then
     phase = 'movement'
   end

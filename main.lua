@@ -6,7 +6,7 @@ UI = require 'UI/UI'
 require 'SaveTableToFile/SaveTable'
 require "UI/_table"
 require "UI/gui"
-require "lume/lume"
+--require "lume/lume"
 json = require 'json4lua/json/json'
 require "Empire/cityCreation"
 require "Empire/unitFunc"
@@ -225,35 +225,36 @@ function love.mousepressed(x, y, button, istouch)
 		end
 		if phase == 'fight' then
 			print('Yes in fact you are in fight phase')
-			for k = 1,#units do
-				if units[k].selected == 1 then
-					--dbugPrint = 1
-			  	unit1 = units[k]
-			    unitFunc:unitAttackRange(unit1.location, unit1.movRange)
-					for i = 1,#attackOutput do
-						print(attackOutput[i][1])
-						print(units[k].location)
-						if units[k].location == attackOutput[i][1] then
-							createMap:genTilePos(units[k].location)
-							if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
-								skip = true
-								print('Good tile clickin fam')
-							  turnTimer:addUnitAttackOrder(units[k], units[k])
+			for i = 1,#units do
+				if units[i].selected then
+
+				else
+					unitFunc:select()
+				end
+			end
+			for q = 1,#map do
+				createMap:genTilePos(q)
+				if checkCollision(drawX, drawY, squareSize, squareSize, worldX, worldY, 1, 1) then
+					for i = 1,#units do
+						if q == units[i].location then
+							for x = 1,#units do
+						    if units[x].selected == 1 then
+									turnTimer:addUnitAttackOrder(units[x], units[i])
+									if notUnselected then
+										unitFunc:select()
+									end
+									break
+								end
 							end
 						end
 					end
 				end
 			end
 		end
-		if skip == false then
-			unitFunc:select()
-		end
 		gui.buttonCheck( x, y, button )
 	end
 	mapFunc:mapColour()
-	if epsilon then
-		dbugPrint = epsilon
-	end
+	unitFunc:select()
 end
 
 function love.mousereleased(x, y, button, isTouch)
@@ -388,12 +389,12 @@ function love.draw()
 	end
 	debugPrint()
 	love.graphics.setColor(0,0,0)
-	if attackOutput then
+	--[[if attackOutput then
 		for i = 1,#attackOutput do
 			love.graphics.print(tostring(attackOutput[i][1]),0,i*30)
 		end
 		for i = 1,#units do
 			love.graphics.print(tostring(units[i].location),50,i*30)
 		end
-	end
+	end]]
 end

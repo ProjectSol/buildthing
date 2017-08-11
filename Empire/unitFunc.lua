@@ -40,8 +40,8 @@ function unitFunc:drawAttackRadius()
                           ---tr corner              tr corner               bottom
         local vertices = {x+squareSize-3, y+3, x+squareSize/2+3, y+3, x+squareSize-3, y+squareSize/2-3}
         love.graphics.setLineWidth(2)
-        ---love.graphics.circle('line', x+squareSize/2, y+squareSize/2, 10)
-        love.graphics.print(attackOutput[k][1], x+squareSize/4, y+squareSize/2)
+        love.graphics.circle('line', x+squareSize/2, y+squareSize/2, 10)
+        --love.graphics.print(attackOutput[k][1], x+squareSize/4, y+squareSize/2)
       end
     end
   end
@@ -398,6 +398,7 @@ end
 function unitFunc:unitAttackRange(tile1, range)
   	atkprOutput = {}
     atkOutput = {}
+    attackOutput = {}
   	local b = tile1
   	for q = -(range-1),(range-1) do
       local tileSel = b+q

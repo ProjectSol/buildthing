@@ -788,8 +788,8 @@ function UI:unitTag(x, y, i)
   local vertices = {x+squareSize-1, y+1, x+squareSize/2, y+1, x+squareSize-1, y+squareSize/2}
   love.graphics.polygon('fill', vertices)
   lg.setColor(white)
-  lg.setFont(status)
-  lg.print(units[i].strength, x+(squareSize/2)-(status:getWidth(units[i].strength)/2), y+(squareSize/2)-(status:getHeight(units[i].strength)/2))
+  lg.setFont(smolFont)
+  lg.print("Str: "..units[i].strength, x+(status:getWidth(units[i].strength)/2), y+(status:getHeight(units[i].strength)/2))
   --love.graphics.print(tostring(units[i].name),x+i/2,y)
 end
 
